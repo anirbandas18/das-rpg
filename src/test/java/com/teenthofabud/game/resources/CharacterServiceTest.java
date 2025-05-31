@@ -1,5 +1,6 @@
 package com.teenthofabud.game.resources;
 
+import com.teenthofabud.game.TestDataSourceProvider;
 import com.teenthofabud.game.constants.charactertype.CharacterType;
 import com.teenthofabud.game.constants.charactertype.service.CharacterTypeService;
 import com.teenthofabud.game.constants.charactertype.service.impl.DefaultCharacterTypeServiceImpl;
@@ -15,12 +16,11 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
-public class CharacterServiceTest {
+public class CharacterServiceTest implements TestDataSourceProvider {
 
     private static CharacterService CHARACTER_SERVICE;
     private static CharacterTypeService CHARACTER_TYPE_SERVICE;
@@ -36,7 +36,7 @@ public class CharacterServiceTest {
     @Test
     public void testCharacterCreationIsSuccessful() {
         assertDoesNotThrow(() -> {
-            Player expectedPlayer = PLAYER_SERVICE.createPlayer(UUID.randomUUID().toString());
+            Player expectedPlayer = player();
             CharacterType expectedCharacterType = CHARACTER_TYPE_SERVICE.retrieveCharacterType(Math.abs(expectedPlayer.hashCode()));
             Character actualCharacter = CHARACTER_SERVICE.createCharacter(expectedPlayer, expectedCharacterType);
             Assertions.assertEquals(expectedPlayer, actualCharacter.getPlayer());
@@ -57,7 +57,7 @@ public class CharacterServiceTest {
     @Test
     public void testCharacterCreationWithNullTypeFailed() {
         assertThrowsExactly(CharacterException.class, () -> {
-            Player expectedPlayer = PLAYER_SERVICE.createPlayer(UUID.randomUUID().toString());
+            Player expectedPlayer = player();
             CharacterType expectedCharacterType = null;
             CHARACTER_SERVICE.createCharacter(expectedPlayer, expectedCharacterType);
         });

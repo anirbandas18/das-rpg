@@ -9,6 +9,11 @@
 mvn clean package -e
 ```
 
+## Coverage
+```
+mvn test -e
+```
+
 ## Run
 ```
 java -jar target/das-rpg.jar

@@ -1,4 +1,4 @@
-package com.teenthofabud.game;
+package com.teenthofabud.game.resources.checkpoint;
 
 import com.teenthofabud.game.resources.character.Character;
 
@@ -7,6 +7,8 @@ import java.util.Objects;
 import java.util.StringJoiner;
 
 public class Checkpoint implements Serializable {
+
+    private static final long serialVersionUID = 1234567L;
 
     private Character character;
 

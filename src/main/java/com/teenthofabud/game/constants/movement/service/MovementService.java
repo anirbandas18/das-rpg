@@ -5,8 +5,6 @@ import com.teenthofabud.game.constants.movement.MovementException;
 
 public interface MovementService {
 
-    public Movement retrieveMovement(int preSeed) throws MovementException;
-
     public Movement retrieveMovement(String key) throws MovementException;
 
 }

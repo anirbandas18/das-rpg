@@ -1,5 +1,6 @@
 package com.teenthofabud.game.resources;
 
+import com.teenthofabud.game.TestDataSourceProvider;
 import com.teenthofabud.game.resources.player.PlayerException;
 import com.teenthofabud.game.resources.player.Player;
 import com.teenthofabud.game.resources.player.service.PlayerService;
@@ -8,11 +9,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class PlayerServiceTest {
+public class PlayerServiceTest implements TestDataSourceProvider {
 
     private static PlayerService PLAYER_SERVICE;
 
@@ -24,9 +24,9 @@ public class PlayerServiceTest {
     @Test
     public void testPlayerCreationIsSuccessful() {
         assertDoesNotThrow(() -> {
-            String expectedPlayerName = UUID.randomUUID().toString();
-            Player actualPlayer = PLAYER_SERVICE.createPlayer(expectedPlayerName);
-            Assertions.assertEquals(expectedPlayerName, actualPlayer.getName());
+            Player expectedPlayer = player();
+            Player actualPlayer = PLAYER_SERVICE.createPlayer(expectedPlayer.getName());
+            Assertions.assertEquals(expectedPlayer, actualPlayer);
         });
     }
 

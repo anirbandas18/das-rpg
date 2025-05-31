@@ -2,9 +2,14 @@ package com.teenthofabud.game;
 
 import com.teenthofabud.game.constants.charactertype.service.CharacterTypeService;
 import com.teenthofabud.game.constants.charactertype.service.impl.DefaultCharacterTypeServiceImpl;
+import com.teenthofabud.game.controller.MainMenuException;
 import com.teenthofabud.game.controller.MainMenuAPI;
 import com.teenthofabud.game.controller.impl.DefaultMainMenuController;
+import com.teenthofabud.game.persistence.FileManager;
+import com.teenthofabud.game.persistence.impl.DefaultCheckpointFileManagerImpl;
+import com.teenthofabud.game.resources.character.Character;
 import com.teenthofabud.game.resources.character.service.CharacterService;
+import com.teenthofabud.game.resources.checkpoint.Checkpoint;
 import com.teenthofabud.game.resources.player.service.PlayerService;
 import com.teenthofabud.game.resources.character.service.impl.DefaultCharacterServiceImpl;
 import com.teenthofabud.game.resources.player.service.DefaultPlayerServiceImpl;
@@ -94,23 +99,39 @@ public class RPG {
     public static void main(String[] args) {
         try {
             BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
+            FileManager<Checkpoint> checkpointFileManager = DefaultCheckpointFileManagerImpl.getInstance(Optional.empty());
             PlayerService playerService = DefaultPlayerServiceImpl.getInstance();
             CharacterTypeService characterTypeService = DefaultCharacterTypeServiceImpl.getInstance();
             CharacterService characterService = DefaultCharacterServiceImpl.getInstance();
-            MainMenuAPI mainMenuAPI = DefaultMainMenuController.getInstance(stdin, playerService, characterTypeService, characterService);
+            MainMenuAPI mainMenuAPI = DefaultMainMenuController.getInstance(stdin, playerService, characterTypeService, characterService, checkpointFileManager);
             RPG rpg = new RPG();
-            Optional<Checkpoint> optionalCheckpoint = rpg.findCheckpoint();
+            Character character = null;
+            Checkpoint checkpoint = null;
             while(true) {
                 System.out.print(mainMenuAPI.getOptions());
                 String option = stdin.readLine();
                 switch (option.toUpperCase()) {
-                    case "C" -> mainMenuAPI.createCharacter();
+                    case "C" -> {
+                        character = mainMenuAPI.createCharacter();
+                    }
+                    case "S" -> {
+                        checkpoint = new Checkpoint.Builder().character(character).build();
+                        mainMenuAPI.saveGame(checkpoint);
+                    }
+                    case "R" -> {
+                        Optional<Checkpoint> optionalCheckpoint = mainMenuAPI.resumeGame();
+                        if(optionalCheckpoint.isPresent()) {
+                            checkpoint = optionalCheckpoint.get();
+                        }
+                    }
                     case "X" -> mainMenuAPI.exitGame();
                     default -> System.err.println("Option " + option + " not supported. Try again!");
                 }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } catch (MainMenuException e) {
+            System.err.println("RPG failure: " + e.getMessage());
         }
     }
 }
