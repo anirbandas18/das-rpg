@@ -13,4 +13,23 @@ public class DefaultPlayerServiceImpl implements PlayerService {
         Player player = new Player.Builder().name(name).build();
         return player;
     }
+
+    private static volatile PlayerService instance;
+
+    private DefaultPlayerServiceImpl() {
+
+    }
+
+    public static PlayerService getInstance() {
+        PlayerService result = instance;
+        if (result != null) {
+            return result;
+        }
+        synchronized(DefaultPlayerServiceImpl.class) {
+            if (instance == null) {
+                instance = new DefaultPlayerServiceImpl();
+            }
+            return instance;
+        }
+    }
 }

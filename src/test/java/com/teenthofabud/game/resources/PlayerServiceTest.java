@@ -18,7 +18,7 @@ public class PlayerServiceTest {
 
     @BeforeAll
     static void beforeAll() {
-        PLAYER_SERVICE = new DefaultPlayerServiceImpl();
+        PLAYER_SERVICE = DefaultPlayerServiceImpl.getInstance();
     }
 
     @Test

@@ -1,13 +1,9 @@
 package com.teenthofabud.game;
 
-import com.teenthofabud.game.constants.charactertype.CharacterTypeException;
-import com.teenthofabud.game.constants.charactertype.CharacterType;
 import com.teenthofabud.game.constants.charactertype.service.CharacterTypeService;
 import com.teenthofabud.game.constants.charactertype.service.impl.DefaultCharacterTypeServiceImpl;
-import com.teenthofabud.game.resources.character.CharacterException;
-import com.teenthofabud.game.resources.player.PlayerException;
-import com.teenthofabud.game.resources.character.Character;
-import com.teenthofabud.game.resources.player.Player;
+import com.teenthofabud.game.controller.MainMenuAPI;
+import com.teenthofabud.game.controller.impl.DefaultMainMenuController;
 import com.teenthofabud.game.resources.character.service.CharacterService;
 import com.teenthofabud.game.resources.player.service.PlayerService;
 import com.teenthofabud.game.resources.character.service.impl.DefaultCharacterServiceImpl;
@@ -21,39 +17,17 @@ import java.util.Optional;
 
 public class RPG {
 
-    private static final String MAIN_MENU_OPTIONS = """
-            Main Menu:
-            ====================
-            C - Create character
-            X - Exit game
-            Enter your option:  
-            """;
-
-    private static final String CHARACTER_MENU_OPTIONS = """
-            Character Menu:
-            =====================
-            S - Striker
-            M - Midfielder
-            D - Defender
-            R - Referee
-            G - Goalkeeper
-            N - Random selection
-            X - Back to main menu
-            Enter your option:  
-            """;
+    /*
 
     private static final String PLAYER_MENU_OPTIONS = """
             P - New player
             F - Find player
             """;
 
+*/
+
     private static final String CHECKPOINT_DATA_DIRECTORY_NAME = "das-rpg";
     private static final String CHECKPOINT_DATA_FILE_NAME = "checkpoint.data";
-
-    private static BufferedReader STDIN = new BufferedReader(new InputStreamReader(System.in));
-    private static PlayerService PLAYER_SERVICE = new DefaultPlayerServiceImpl();
-    private static CharacterTypeService CHARACTER_TYPE_SERVICE = new DefaultCharacterTypeServiceImpl();
-    private static CharacterService CHARACTER_SERVICE = new DefaultCharacterServiceImpl();
 
     public void writeObjectToFile(Checkpoint checkpoint, File file) throws IOException {
         try (FileOutputStream fos = new FileOutputStream(file);
@@ -117,37 +91,21 @@ public class RPG {
         }
     }
 
-    public void createCharacter() {
-        try {
-            System.out.println("Enter player name: ");
-            Player player = PLAYER_SERVICE.createPlayer(STDIN.readLine());
-            CharacterType type = CHARACTER_TYPE_SERVICE.retrieveCharacterType(player.hashCode());
-            Character character = CHARACTER_SERVICE.createCharacter(player, type);
-            System.out.println("Created character: " + character);
-        } catch (PlayerException | CharacterException | CharacterTypeException e) {
-            System.err.println(e.getMessage());
-        } catch (IOException e) {
-            System.err.println("Game failure: " + e.getMessage());
-        }
-    }
-
     public static void main(String[] args) {
         try {
-
+            BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
+            PlayerService playerService = DefaultPlayerServiceImpl.getInstance();
+            CharacterTypeService characterTypeService = DefaultCharacterTypeServiceImpl.getInstance();
+            CharacterService characterService = DefaultCharacterServiceImpl.getInstance();
+            MainMenuAPI mainMenuAPI = DefaultMainMenuController.getInstance(stdin, playerService, characterTypeService, characterService);
             RPG rpg = new RPG();
-
             Optional<Checkpoint> optionalCheckpoint = rpg.findCheckpoint();
             while(true) {
-                System.out.print(MAIN_MENU_OPTIONS);
-                String option = STDIN.readLine();
+                System.out.print(mainMenuAPI.getOptions());
+                String option = stdin.readLine();
                 switch (option.toUpperCase()) {
-                    case "C" -> rpg.createCharacter();
-                    case "R" -> System.out.println("Resuming game from last saved checkpoint");
-                    case "S" -> System.out.println("Saving game....");
-                    case "X" -> {
-                        System.out.println("Exiting game....");
-                        System.exit(0);
-                    }
+                    case "C" -> mainMenuAPI.createCharacter();
+                    case "X" -> mainMenuAPI.exitGame();
                     default -> System.err.println("Option " + option + " not supported. Try again!");
                 }
             }

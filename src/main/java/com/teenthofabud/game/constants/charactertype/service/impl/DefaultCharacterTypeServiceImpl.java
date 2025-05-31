@@ -9,6 +9,7 @@ import java.util.Random;
 
 public class DefaultCharacterTypeServiceImpl implements CharacterTypeService {
 
+    @Override
     public CharacterType retrieveCharacterType(int preSeed) throws CharacterTypeException {
         if(preSeed < 1) {
             throw new CharacterTypeException("preSeed " + preSeed + " is too less");
@@ -21,6 +22,7 @@ public class DefaultCharacterTypeServiceImpl implements CharacterTypeService {
         return CharacterType.values()[randomizedIndex];
     }
 
+    @Override
     public CharacterType retrieveCharacterType(String key) throws CharacterTypeException {
         if(key == null) {
             throw new CharacterTypeException("key " + key + " is required");
@@ -29,6 +31,25 @@ public class DefaultCharacterTypeServiceImpl implements CharacterTypeService {
                 .filter(e -> e.getKey().compareTo(key) == 0).
                 findFirst()
                 .orElseThrow(() -> new CharacterTypeException("key " + key + " not recognized"));
+    }
+
+    private static volatile CharacterTypeService instance;
+
+    private DefaultCharacterTypeServiceImpl() {
+
+    }
+
+    public static CharacterTypeService getInstance() {
+        CharacterTypeService result = instance;
+        if (result != null) {
+            return result;
+        }
+        synchronized(DefaultCharacterTypeServiceImpl.class) {
+            if (instance == null) {
+                instance = new DefaultCharacterTypeServiceImpl();
+            }
+            return instance;
+        }
     }
 
 }

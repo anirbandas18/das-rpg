@@ -28,9 +28,9 @@ public class CharacterServiceTest {
 
     @BeforeAll
     static void beforeAll() {
-        CHARACTER_SERVICE = new DefaultCharacterServiceImpl();
-        CHARACTER_TYPE_SERVICE = new DefaultCharacterTypeServiceImpl();
-        PLAYER_SERVICE = new DefaultPlayerServiceImpl();
+        CHARACTER_SERVICE = DefaultCharacterServiceImpl.getInstance();
+        CHARACTER_TYPE_SERVICE = DefaultCharacterTypeServiceImpl.getInstance();
+        PLAYER_SERVICE = DefaultPlayerServiceImpl.getInstance();
     }
 
     @Test

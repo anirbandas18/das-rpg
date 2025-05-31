@@ -1,7 +1,5 @@
 package com.teenthofabud.game.constants.movement;
 
-import java.util.StringJoiner;
-
 public enum Movement {
 
     UP("U"),
@@ -21,8 +19,6 @@ public enum Movement {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", Movement.class.getSimpleName() + "[", "]")
-                .add("key='" + key + "'")
-                .toString();
+        return this.name();
     }
 }

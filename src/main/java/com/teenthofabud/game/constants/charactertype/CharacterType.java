@@ -1,7 +1,5 @@
 package com.teenthofabud.game.constants.charactertype;
 
-import java.util.StringJoiner;
-
 public enum CharacterType {
 
     STRIKER("S"),
@@ -22,8 +20,7 @@ public enum CharacterType {
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", CharacterType.class.getSimpleName() + "[", "]")
-                .add("key='" + key + "'")
-                .toString();
+        return this.name();
     }
+
 }

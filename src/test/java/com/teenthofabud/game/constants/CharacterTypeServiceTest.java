@@ -15,13 +15,13 @@ import java.util.concurrent.ThreadLocalRandom;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
-public class MovementServiceTest {
+public class CharacterTypeServiceTest {
 
     private static CharacterTypeService CHARACTER_TYPE_SERVICE;
 
     @BeforeAll
     static void beforeAll() {
-        CHARACTER_TYPE_SERVICE = new DefaultCharacterTypeServiceImpl();
+        CHARACTER_TYPE_SERVICE = DefaultCharacterTypeServiceImpl.getInstance();
     }
 
     @Test
@@ -37,7 +37,6 @@ public class MovementServiceTest {
     @ValueSource(ints = { 0, -1 })
     public void testCharacterTypeRetrievalByInvalidPreSeedFailed(int expectedPreSeed) {
         assertThrowsExactly(CharacterTypeException.class, () -> {
-            CharacterTypeService characterTypeService = new DefaultCharacterTypeServiceImpl();
             CHARACTER_TYPE_SERVICE.retrieveCharacterType(expectedPreSeed);
         });
     }
