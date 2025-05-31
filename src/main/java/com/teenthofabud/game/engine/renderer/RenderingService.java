@@ -1,4 +1,4 @@
-package com.teenthofabud.game.renderer;
+package com.teenthofabud.game.engine.renderer;
 
 public interface RenderingService {
 

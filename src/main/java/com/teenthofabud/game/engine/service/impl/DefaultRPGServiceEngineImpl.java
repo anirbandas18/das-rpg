@@ -1,16 +1,16 @@
-package com.teenthofabud.game.engine.impl;
+package com.teenthofabud.game.engine.service.impl;
 
 import com.teenthofabud.game.constants.charactertype.service.CharacterTypeService;
 import com.teenthofabud.game.constants.charactertype.service.impl.DefaultCharacterTypeServiceImpl;
-import com.teenthofabud.game.controller.MainMenuAPI;
-import com.teenthofabud.game.controller.MainMenuException;
-import com.teenthofabud.game.controller.impl.DefaultMainMenuController;
-import com.teenthofabud.game.engine.RPG;
-import com.teenthofabud.game.engine.RPGException;
+import com.teenthofabud.game.engine.controller.MenuAPI;
+import com.teenthofabud.game.engine.controller.MenuException;
+import com.teenthofabud.game.engine.controller.impl.DefaultMenuControllerImpl;
+import com.teenthofabud.game.engine.service.RPGService;
+import com.teenthofabud.game.engine.service.RPGException;
 import com.teenthofabud.game.persistence.repository.FileManager;
 import com.teenthofabud.game.persistence.repository.impl.DefaultCheckpointFileManagerImpl;
-import com.teenthofabud.game.renderer.RenderingService;
-import com.teenthofabud.game.renderer.impl.DefaultStdoutRenderingImpl;
+import com.teenthofabud.game.engine.renderer.RenderingService;
+import com.teenthofabud.game.engine.renderer.impl.DefaultStdoutRenderingImpl;
 import com.teenthofabud.game.resources.character.Character;
 import com.teenthofabud.game.resources.character.service.CharacterService;
 import com.teenthofabud.game.resources.character.service.impl.DefaultCharacterServiceImpl;
@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Optional;
 
-public class DefaultRPGEngineImpl implements RPG {
+public class DefaultRPGServiceEngineImpl implements RPGService {
 
     private static final String GAME_MENU = """
             ▐▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▌
@@ -42,16 +42,16 @@ public class DefaultRPGEngineImpl implements RPG {
     private CharacterTypeService characterTypeService;
     private CharacterService characterService;
     private RenderingService renderingService;
-    private MainMenuAPI mainMenuAPI;
+    private MenuAPI menuAPI;
 
-    private DefaultRPGEngineImpl() {
+    private DefaultRPGServiceEngineImpl() {
         this.stdin = new BufferedReader(new InputStreamReader(System.in));
         this.checkpointFileManager = DefaultCheckpointFileManagerImpl.getInstance(Optional.empty());
         this.playerService = DefaultPlayerServiceImpl.getInstance();
         this.characterTypeService = DefaultCharacterTypeServiceImpl.getInstance();
         this.characterService = DefaultCharacterServiceImpl.getInstance();
         this.renderingService = DefaultStdoutRenderingImpl.getInstance();
-        this.mainMenuAPI = DefaultMainMenuController.getInstance(stdin, playerService, characterTypeService, characterService, checkpointFileManager, renderingService);
+        this.menuAPI = DefaultMenuControllerImpl.getInstance(stdin, playerService, characterTypeService, characterService, checkpointFileManager, renderingService);
     }
 
     @Override
@@ -64,39 +64,39 @@ public class DefaultRPGEngineImpl implements RPG {
                 String option = stdin.readLine();
                 switch (option.toUpperCase()) {
                     case "C" -> {
-                        character = mainMenuAPI.createCharacter();
+                        character = menuAPI.createCharacter();
                     }
                     case "S" -> {
                         checkpoint = new Checkpoint.Builder().character(character).build();
-                        mainMenuAPI.saveGame(checkpoint);
+                        menuAPI.saveGame(checkpoint);
                     }
                     case "R" -> {
-                        Optional<Checkpoint> optionalCheckpoint = mainMenuAPI.resumeGame();
+                        Optional<Checkpoint> optionalCheckpoint = menuAPI.resumeGame();
                         if(optionalCheckpoint.isPresent()) {
                             checkpoint = optionalCheckpoint.get();
                         }
                     }
-                    case "X" -> mainMenuAPI.exitGame();
+                    case "X" -> menuAPI.exitGame();
                     default -> renderingService.error("Option " + option + " not supported. Try again!");
                 }
             }
         } catch (IOException e) {
             throw new RPGException(e.getClass().getSimpleName() + ": " + e);
-        } catch (MainMenuException e) {
+        } catch (MenuException e) {
             System.err.println("Driver failure: " + e.getMessage());
         }
     }
 
-    private static volatile RPG INSTANCE;
+    private static volatile RPGService INSTANCE;
 
-    public static RPG getInstance() {
-        RPG result = INSTANCE;
+    public static RPGService getInstance() {
+        RPGService result = INSTANCE;
         if (result != null) {
             return result;
         }
-        synchronized(DefaultRPGEngineImpl.class) {
+        synchronized(DefaultRPGServiceEngineImpl.class) {
             if (INSTANCE == null) {
-                INSTANCE = new DefaultRPGEngineImpl();
+                INSTANCE = new DefaultRPGServiceEngineImpl();
             }
             return INSTANCE;
         }

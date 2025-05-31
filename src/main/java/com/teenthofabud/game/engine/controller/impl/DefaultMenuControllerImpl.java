@@ -1,13 +1,13 @@
-package com.teenthofabud.game.controller.impl;
+package com.teenthofabud.game.engine.controller.impl;
 
 import com.teenthofabud.game.constants.charactertype.CharacterType;
 import com.teenthofabud.game.constants.charactertype.CharacterTypeException;
 import com.teenthofabud.game.constants.charactertype.service.CharacterTypeService;
-import com.teenthofabud.game.controller.MainMenuException;
-import com.teenthofabud.game.controller.MainMenuAPI;
+import com.teenthofabud.game.engine.controller.MenuException;
+import com.teenthofabud.game.engine.controller.MenuAPI;
 import com.teenthofabud.game.persistence.FileManagementException;
 import com.teenthofabud.game.persistence.repository.FileManager;
-import com.teenthofabud.game.renderer.RenderingService;
+import com.teenthofabud.game.engine.renderer.RenderingService;
 import com.teenthofabud.game.resources.character.Character;
 import com.teenthofabud.game.resources.character.CharacterException;
 import com.teenthofabud.game.resources.character.service.CharacterService;
@@ -20,7 +20,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Optional;
 
-public class DefaultMainMenuController implements MainMenuAPI {
+public class DefaultMenuControllerImpl implements MenuAPI {
 
     private BufferedReader stdin;
     private PlayerService playerService;
@@ -29,7 +29,7 @@ public class DefaultMainMenuController implements MainMenuAPI {
     private FileManager<Checkpoint> checkpointFileManager;
     private RenderingService renderingService;
 
-    private DefaultMainMenuController(BufferedReader stdin,
+    private DefaultMenuControllerImpl(BufferedReader stdin,
                                       PlayerService playerService,
                                       CharacterTypeService characterTypeService,
                                       CharacterService characterService,
@@ -44,7 +44,7 @@ public class DefaultMainMenuController implements MainMenuAPI {
     }
 
     @Override
-    public Character createCharacter() throws MainMenuException {
+    public Character createCharacter() throws MenuException {
         Character character = null;
         try {
             renderingService.info("Enter player name: ");
@@ -52,17 +52,16 @@ public class DefaultMainMenuController implements MainMenuAPI {
             CharacterType type = characterTypeService.retrieveCharacterType(Math.abs(player.hashCode()));
             character = characterService.createCharacter(player, type);
             renderingService.success("Created character: " + character);
-            return character;
         } catch (PlayerException | CharacterException | CharacterTypeException e) {
             renderingService.error(e.getMessage());
         } catch (IOException e) {
-            throw new MainMenuException(e.getMessage());
+            throw new MenuException(e.getMessage());
         }
         return character;
     }
 
     @Override
-    public void saveGame(Checkpoint checkpoint) throws MainMenuException {
+    public void saveGame(Checkpoint checkpoint) throws MenuException {
         if(checkpoint != null) {
             if(checkpoint.getCharacter() == null) {
                 renderingService.warn("No progress available to save!");
@@ -74,20 +73,20 @@ public class DefaultMainMenuController implements MainMenuAPI {
             } catch (FileManagementException e) {
                 renderingService.error(e.getMessage());
             }
-            renderingService.success("Checkpoint saved");
+            renderingService.success("Checkpoint saved for " + checkpoint.getCharacter());
         } else {
             renderingService.info("No checkpoint to save!");
         }
     }
 
     @Override
-    public Optional<Checkpoint> resumeGame() throws MainMenuException {
+    public Optional<Checkpoint> resumeGame() throws MenuException {
         Optional<Checkpoint> optionalCheckpoint = Optional.empty();
         renderingService.info("Resuming checkpoint....");
         try {
             optionalCheckpoint = checkpointFileManager.readData();
             if(optionalCheckpoint.isPresent()) {
-                renderingService.success("Resumed from checkpoint");
+                renderingService.success("Resumed " + optionalCheckpoint.get().getCharacter() + " from checkpoint");
             } else {
                 renderingService.warn("No saved checkpoint available!");
             }
@@ -103,23 +102,23 @@ public class DefaultMainMenuController implements MainMenuAPI {
         System.exit(0);
     }
 
-    private static volatile MainMenuAPI instance;
+    private static volatile MenuAPI INSTANCE;
 
-    public static MainMenuAPI getInstance(BufferedReader stdin,
-                                          PlayerService playerService,
-                                          CharacterTypeService characterTypeService,
-                                          CharacterService characterService,
-                                          FileManager<Checkpoint> checkpointFileManager,
-                                          RenderingService renderingService) {
-        MainMenuAPI result = instance;
+    public static MenuAPI getInstance(BufferedReader stdin,
+                                      PlayerService playerService,
+                                      CharacterTypeService characterTypeService,
+                                      CharacterService characterService,
+                                      FileManager<Checkpoint> checkpointFileManager,
+                                      RenderingService renderingService) {
+        MenuAPI result = INSTANCE;
         if (result != null) {
             return result;
         }
-        synchronized(DefaultMainMenuController.class) {
-            if (instance == null) {
-                instance = new DefaultMainMenuController(stdin, playerService, characterTypeService, characterService, checkpointFileManager, renderingService);
+        synchronized(DefaultMenuControllerImpl.class) {
+            if (INSTANCE == null) {
+                INSTANCE = new DefaultMenuControllerImpl(stdin, playerService, characterTypeService, characterService, checkpointFileManager, renderingService);
             }
-            return instance;
+            return INSTANCE;
         }
     }
 

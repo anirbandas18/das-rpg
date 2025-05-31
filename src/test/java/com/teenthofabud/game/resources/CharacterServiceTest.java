@@ -8,9 +8,7 @@ import com.teenthofabud.game.resources.character.CharacterException;
 import com.teenthofabud.game.resources.character.Character;
 import com.teenthofabud.game.resources.player.Player;
 import com.teenthofabud.game.resources.character.service.CharacterService;
-import com.teenthofabud.game.resources.player.service.PlayerService;
 import com.teenthofabud.game.resources.character.service.impl.DefaultCharacterServiceImpl;
-import com.teenthofabud.game.resources.player.service.impl.DefaultPlayerServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -24,13 +22,11 @@ public class CharacterServiceTest implements TestDataSourceProvider {
 
     private static CharacterService CHARACTER_SERVICE;
     private static CharacterTypeService CHARACTER_TYPE_SERVICE;
-    private static PlayerService PLAYER_SERVICE;
 
     @BeforeAll
     static void beforeAll() {
         CHARACTER_SERVICE = DefaultCharacterServiceImpl.getInstance();
         CHARACTER_TYPE_SERVICE = DefaultCharacterTypeServiceImpl.getInstance();
-        PLAYER_SERVICE = DefaultPlayerServiceImpl.getInstance();
     }
 
     @Test

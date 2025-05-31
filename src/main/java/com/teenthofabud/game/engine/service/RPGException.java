@@ -1,4 +1,4 @@
-package com.teenthofabud.game.engine;
+package com.teenthofabud.game.engine.service;
 
 public class RPGException extends Exception {
 

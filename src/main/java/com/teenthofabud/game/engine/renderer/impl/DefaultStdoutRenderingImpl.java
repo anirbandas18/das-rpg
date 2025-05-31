@@ -1,6 +1,6 @@
-package com.teenthofabud.game.renderer.impl;
+package com.teenthofabud.game.engine.renderer.impl;
 
-import com.teenthofabud.game.renderer.RenderingService;
+import com.teenthofabud.game.engine.renderer.RenderingService;
 
 public class DefaultStdoutRenderingImpl implements RenderingService {
 

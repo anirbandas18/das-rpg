@@ -13,18 +13,12 @@ public interface TestDataSourceProvider {
         return new Player.Builder().name(UUID.randomUUID().toString()).build();
     }
 
+    default Player player(String name) {
+        return new Player.Builder().name(name).build();
+    }
+
     default Character character(Player player, CharacterType characterType) {
         return new Character.Builder().type(characterType).player(player).build();
-        /*Character character = null;
-        try {
-            *//*Player player = player();
-            CharacterTypeService characterTypeService = DefaultCharacterTypeServiceImpl.getInstance();
-            CharacterType expectedCharacterType = characterTypeService.retrieveCharacterType(Math.abs(player.hashCode()));*//*
-            character = new Character.Builder().type(characterType).player(player()).build();
-        } catch (CharacterTypeException e) {
-            System.err.println(e.getMessage());
-        }
-        return character;*/
     }
 
     default Checkpoint checkpoint(Character character) {
