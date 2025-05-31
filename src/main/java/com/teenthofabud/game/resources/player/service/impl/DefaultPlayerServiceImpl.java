@@ -1,7 +1,8 @@
-package com.teenthofabud.game.resources.player.service;
+package com.teenthofabud.game.resources.player.service.impl;
 
 import com.teenthofabud.game.resources.player.Player;
 import com.teenthofabud.game.resources.player.PlayerException;
+import com.teenthofabud.game.resources.player.service.PlayerService;
 
 public class DefaultPlayerServiceImpl implements PlayerService {
 
@@ -14,22 +15,22 @@ public class DefaultPlayerServiceImpl implements PlayerService {
         return player;
     }
 
-    private static volatile PlayerService instance;
+    private static volatile PlayerService INSTANCE;
 
     private DefaultPlayerServiceImpl() {
 
     }
 
     public static PlayerService getInstance() {
-        PlayerService result = instance;
+        PlayerService result = INSTANCE;
         if (result != null) {
             return result;
         }
         synchronized(DefaultPlayerServiceImpl.class) {
-            if (instance == null) {
-                instance = new DefaultPlayerServiceImpl();
+            if (INSTANCE == null) {
+                INSTANCE = new DefaultPlayerServiceImpl();
             }
-            return instance;
+            return INSTANCE;
         }
     }
 }

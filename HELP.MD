@@ -17,3 +17,5 @@ The main menu has the following options:
 * Enter option R to resume the game from the last saved state of the character
 * Enter option X to exit the game
 
+Progress is measured by creating a character, exploring a map or fighting an enemy
+

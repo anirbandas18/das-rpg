@@ -33,22 +33,22 @@ public class DefaultCharacterTypeServiceImpl implements CharacterTypeService {
                 .orElseThrow(() -> new CharacterTypeException("key " + key + " not recognized"));
     }
 
-    private static volatile CharacterTypeService instance;
+    private static volatile CharacterTypeService INSTANCE;
 
     private DefaultCharacterTypeServiceImpl() {
 
     }
 
     public static CharacterTypeService getInstance() {
-        CharacterTypeService result = instance;
+        CharacterTypeService result = INSTANCE;
         if (result != null) {
             return result;
         }
         synchronized(DefaultCharacterTypeServiceImpl.class) {
-            if (instance == null) {
-                instance = new DefaultCharacterTypeServiceImpl();
+            if (INSTANCE == null) {
+                INSTANCE = new DefaultCharacterTypeServiceImpl();
             }
-            return instance;
+            return INSTANCE;
         }
     }
 

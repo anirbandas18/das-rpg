@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.teenthofabud.game</groupId>
-    <artifactId>das-rpg</artifactId>
+    <artifactId>das-fussball-rpg</artifactId>
     <version>1.1</version>
 
     <properties>

@@ -5,129 +5,85 @@ import com.teenthofabud.game.constants.charactertype.service.impl.DefaultCharact
 import com.teenthofabud.game.controller.MainMenuException;
 import com.teenthofabud.game.controller.MainMenuAPI;
 import com.teenthofabud.game.controller.impl.DefaultMainMenuController;
-import com.teenthofabud.game.persistence.FileManager;
-import com.teenthofabud.game.persistence.impl.DefaultCheckpointFileManagerImpl;
+import com.teenthofabud.game.persistence.repository.FileManager;
+import com.teenthofabud.game.persistence.repository.impl.DefaultCheckpointFileManagerImpl;
+import com.teenthofabud.game.renderer.RenderingService;
+import com.teenthofabud.game.renderer.impl.DefaultStdoutRenderingImpl;
 import com.teenthofabud.game.resources.character.Character;
 import com.teenthofabud.game.resources.character.service.CharacterService;
 import com.teenthofabud.game.resources.checkpoint.Checkpoint;
 import com.teenthofabud.game.resources.player.service.PlayerService;
 import com.teenthofabud.game.resources.character.service.impl.DefaultCharacterServiceImpl;
-import com.teenthofabud.game.resources.player.service.DefaultPlayerServiceImpl;
+import com.teenthofabud.game.resources.player.service.impl.DefaultPlayerServiceImpl;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
 
 public class RPG {
 
-    /*
+    private BufferedReader stdin;
+    private FileManager<Checkpoint> checkpointFileManager;
+    private PlayerService playerService;
+    private CharacterTypeService characterTypeService;
+    private CharacterService characterService;
+    private RenderingService renderingService;
+    private MainMenuAPI mainMenuAPI;
 
-    private static final String PLAYER_MENU_OPTIONS = """
-            P - New player
-            F - Find player
-            """;
-
-*/
-
-    private static final String CHECKPOINT_DATA_DIRECTORY_NAME = "das-rpg";
-    private static final String CHECKPOINT_DATA_FILE_NAME = "checkpoint.data";
-
-    public void writeObjectToFile(Checkpoint checkpoint, File file) throws IOException {
-        try (FileOutputStream fos = new FileOutputStream(file);
-             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
-            oos.writeObject(checkpoint);
-            oos.flush();
-        }
+    private RPG() {
+        this.stdin = new BufferedReader(new InputStreamReader(System.in));
+        this.checkpointFileManager = DefaultCheckpointFileManagerImpl.getInstance(Optional.empty());
+        this.playerService = DefaultPlayerServiceImpl.getInstance();
+        this.characterTypeService = DefaultCharacterTypeServiceImpl.getInstance();
+        this.characterService = DefaultCharacterServiceImpl.getInstance();
+        this.renderingService = DefaultStdoutRenderingImpl.getInstance();
+        this.mainMenuAPI = DefaultMainMenuController.getInstance(stdin, playerService, characterTypeService, characterService, checkpointFileManager, renderingService);
     }
 
-    public Optional<Checkpoint> readObjectFromFile(File file) throws IOException, ClassNotFoundException {
-        Optional<Checkpoint> optionalCheckpoint = Optional.empty();
-        try (FileInputStream fis = new FileInputStream(file);
-             ObjectInputStream ois = new ObjectInputStream(fis)) {
-            Checkpoint checkpoint = (Checkpoint) ois.readObject();
-            optionalCheckpoint = Optional.of(checkpoint);
-        }
-        return optionalCheckpoint;
-    }
-
-    private byte[] serialize(Object object) throws IOException {
-        ByteArrayOutputStream boas = new ByteArrayOutputStream();
-        ObjectOutputStream ois = new ObjectOutputStream(boas);
-        ois.writeObject(object);
-        return boas.toByteArray();
-    }
-
-    private Object deserialize(byte[] bytes) throws IOException, ClassNotFoundException {
-        InputStream is = new ByteArrayInputStream(bytes);
-        ObjectInputStream ois = new ObjectInputStream(is);
-        return ois.readObject();
-    }
-
-    public Optional<Checkpoint> findCheckpoint() {
-        Optional<Checkpoint> optionalCheckpoint = Optional.empty();
-        Path dataPath = Paths.get(System.getProperty("user.dir"), CHECKPOINT_DATA_DIRECTORY_NAME, CHECKPOINT_DATA_FILE_NAME);
-        try {
-            if(Files.exists(dataPath) && !Files.isDirectory(dataPath)) {
-                byte[] rawBytes = Files.readAllBytes(dataPath);
-                Checkpoint checkpoint = (Checkpoint) deserialize(rawBytes);
-                optionalCheckpoint = Optional.of(checkpoint);
-            } else if(!Files.exists(dataPath)) {
-                Files.createDirectories(dataPath);
+    public void play() throws IOException, MainMenuException {
+        Character character = null;
+        Checkpoint checkpoint = null;
+        while(true) {
+            System.out.print(mainMenuAPI.getOptions());
+            String option = stdin.readLine();
+            switch (option.toUpperCase()) {
+                case "C" -> {
+                    character = mainMenuAPI.createCharacter();
+                }
+                case "S" -> {
+                    checkpoint = new Checkpoint.Builder().character(character).build();
+                    mainMenuAPI.saveGame(checkpoint);
+                }
+                case "R" -> {
+                    Optional<Checkpoint> optionalCheckpoint = mainMenuAPI.resumeGame();
+                    if(optionalCheckpoint.isPresent()) {
+                        checkpoint = optionalCheckpoint.get();
+                    }
+                }
+                case "X" -> mainMenuAPI.exitGame();
+                default -> System.err.println("Option " + option + " not supported. Try again!");
             }
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
         }
-        return optionalCheckpoint;
     }
 
-    public void saveCheckpoint(Checkpoint checkpoint) {
-        Path dataPath = Paths.get(System.getProperty("user.dir"), CHECKPOINT_DATA_DIRECTORY_NAME, CHECKPOINT_DATA_FILE_NAME);
-        try {
-            if(Files.exists(dataPath)) {
-                byte[] rawBytes = serialize(checkpoint);
-                Files.write(dataPath, rawBytes);
-            } else {
-                throw new RuntimeException(dataPath + " does not exist");
+    private static volatile RPG INSTANCE;
+
+    public static RPG getInstance() {
+        RPG result = INSTANCE;
+        if (result != null) {
+            return result;
+        }
+        synchronized(RPG.class) {
+            if (INSTANCE == null) {
+                INSTANCE = new RPG();
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            return INSTANCE;
         }
     }
 
     public static void main(String[] args) {
         try {
-            BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
-            FileManager<Checkpoint> checkpointFileManager = DefaultCheckpointFileManagerImpl.getInstance(Optional.empty());
-            PlayerService playerService = DefaultPlayerServiceImpl.getInstance();
-            CharacterTypeService characterTypeService = DefaultCharacterTypeServiceImpl.getInstance();
-            CharacterService characterService = DefaultCharacterServiceImpl.getInstance();
-            MainMenuAPI mainMenuAPI = DefaultMainMenuController.getInstance(stdin, playerService, characterTypeService, characterService, checkpointFileManager);
-            RPG rpg = new RPG();
-            Character character = null;
-            Checkpoint checkpoint = null;
-            while(true) {
-                System.out.print(mainMenuAPI.getOptions());
-                String option = stdin.readLine();
-                switch (option.toUpperCase()) {
-                    case "C" -> {
-                        character = mainMenuAPI.createCharacter();
-                    }
-                    case "S" -> {
-                        checkpoint = new Checkpoint.Builder().character(character).build();
-                        mainMenuAPI.saveGame(checkpoint);
-                    }
-                    case "R" -> {
-                        Optional<Checkpoint> optionalCheckpoint = mainMenuAPI.resumeGame();
-                        if(optionalCheckpoint.isPresent()) {
-                            checkpoint = optionalCheckpoint.get();
-                        }
-                    }
-                    case "X" -> mainMenuAPI.exitGame();
-                    default -> System.err.println("Option " + option + " not supported. Try again!");
-                }
-            }
+            RPG rpgGame = RPG.getInstance();
+            rpgGame.play();
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (MainMenuException e) {

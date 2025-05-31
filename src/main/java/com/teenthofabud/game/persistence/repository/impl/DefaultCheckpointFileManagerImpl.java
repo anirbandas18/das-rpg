@@ -1,7 +1,7 @@
-package com.teenthofabud.game.persistence.impl;
+package com.teenthofabud.game.persistence.repository.impl;
 
 import com.teenthofabud.game.persistence.FileManagementException;
-import com.teenthofabud.game.persistence.FileManager;
+import com.teenthofabud.game.persistence.repository.FileManager;
 import com.teenthofabud.game.resources.checkpoint.Checkpoint;
 import java.io.IOException;
 import java.nio.file.FileSystem;
@@ -62,7 +62,7 @@ public class DefaultCheckpointFileManagerImpl implements FileManager<Checkpoint>
         return this.fileSystem;
     }
 
-    private static volatile FileManager<Checkpoint> instance;
+    private static volatile FileManager<Checkpoint> INSTANCE;
 
     private DefaultCheckpointFileManagerImpl(FileSystem fileSystem) {
         this.fileSystem = fileSystem;
@@ -73,17 +73,17 @@ public class DefaultCheckpointFileManagerImpl implements FileManager<Checkpoint>
     }
 
     public static FileManager<Checkpoint> getInstance(Optional<FileSystem> fileSystem) {
-        FileManager<Checkpoint> result = instance;
+        FileManager<Checkpoint> result = INSTANCE;
         if (result != null) {
             return result;
         }
         synchronized(DefaultCheckpointFileManagerImpl.class) {
-            if (instance == null) {
-                instance = fileSystem.isEmpty() ?
+            if (INSTANCE == null) {
+                INSTANCE = fileSystem.isEmpty() ?
                         new DefaultCheckpointFileManagerImpl()
                         : new DefaultCheckpointFileManagerImpl(fileSystem.get());
             }
-            return instance;
+            return INSTANCE;
         }
     }
 

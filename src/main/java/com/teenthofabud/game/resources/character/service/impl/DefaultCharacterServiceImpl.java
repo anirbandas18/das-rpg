@@ -20,22 +20,22 @@ public class DefaultCharacterServiceImpl implements CharacterService {
         return character;
     }
 
-    private static volatile CharacterService instance;
+    private static volatile CharacterService INSTANCE;
 
     private DefaultCharacterServiceImpl() {
 
     }
 
     public static CharacterService getInstance() {
-        CharacterService result = instance;
+        CharacterService result = INSTANCE;
         if (result != null) {
             return result;
         }
         synchronized(DefaultCharacterServiceImpl.class) {
-            if (instance == null) {
-                instance = new DefaultCharacterServiceImpl();
+            if (INSTANCE == null) {
+                INSTANCE = new DefaultCharacterServiceImpl();
             }
-            return instance;
+            return INSTANCE;
         }
     }
 

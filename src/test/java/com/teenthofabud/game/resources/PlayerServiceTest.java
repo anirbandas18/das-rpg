@@ -4,7 +4,7 @@ import com.teenthofabud.game.TestDataSourceProvider;
 import com.teenthofabud.game.resources.player.PlayerException;
 import com.teenthofabud.game.resources.player.Player;
 import com.teenthofabud.game.resources.player.service.PlayerService;
-import com.teenthofabud.game.resources.player.service.DefaultPlayerServiceImpl;
+import com.teenthofabud.game.resources.player.service.impl.DefaultPlayerServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

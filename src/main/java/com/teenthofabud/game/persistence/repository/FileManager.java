@@ -1,4 +1,6 @@
-package com.teenthofabud.game.persistence;
+package com.teenthofabud.game.persistence.repository;
+
+import com.teenthofabud.game.persistence.FileManagementException;
 
 import java.io.*;
 import java.nio.file.FileSystem;

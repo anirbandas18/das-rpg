@@ -1,8 +1,9 @@
-# DAS RPG
+# Das Fussball §RPG
 
 ## System requirements
 * JDK 21
 * Maven 3.9.x
+* Permission for the game to write in the current directory
 
 ## Build
 ```
@@ -16,7 +17,7 @@ mvn test -e
 
 ## Run
 ```
-java -jar target/das-rpg.jar
+java -jar target/das-fussball-rpg.jar
 ```
 *Note: Further instructions on how to play the game can be found in HELP.MD*
 

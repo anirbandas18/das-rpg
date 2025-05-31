@@ -18,22 +18,22 @@ public class DefaultMovementServiceImpl implements MovementService {
                 .orElseThrow(() -> new MovementException("key " + key + " not recognized"));
     }
 
-    private static volatile MovementService instance;
+    private static volatile MovementService INSTANCE;
 
     private DefaultMovementServiceImpl() {
 
     }
 
     public static MovementService getInstance() {
-        MovementService result = instance;
+        MovementService result = INSTANCE;
         if (result != null) {
             return result;
         }
         synchronized(DefaultMovementServiceImpl.class) {
-            if (instance == null) {
-                instance = new DefaultMovementServiceImpl();
+            if (INSTANCE == null) {
+                INSTANCE = new DefaultMovementServiceImpl();
             }
-            return instance;
+            return INSTANCE;
         }
     }
 
