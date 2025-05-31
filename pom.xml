@@ -6,7 +6,7 @@
 
     <groupId>com.teenthofabud.game</groupId>
     <artifactId>das-fussball-rpg</artifactId>
-    <version>1.1</version>
+    <version>2.0</version>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -40,7 +40,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>${project.groupId}.RPG</mainClass>
+                            <mainClass>${project.groupId}.Driver</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

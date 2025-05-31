@@ -2,6 +2,8 @@ package com.teenthofabud.game.renderer;
 
 public interface RenderingService {
 
+    public void menu(String options);
+
     public void info(String message);
 
     public void success(String message);
