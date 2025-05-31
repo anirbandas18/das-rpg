@@ -2,7 +2,18 @@ The main menu is presented to the player on the console at startup when the game
 
 The main menu has the following options:
 ```
-C - Create character
-X - Exit game
+▐▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▌
+▐      Main Menu         ▌
+▐========================▌
+▐  C - Create character  ▌
+▐  S - Save game         ▌
+▐  R - Resume game       ▌
+▐  X - Exit game         ▌
+▐▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▌
 ```
+
+* Enter option C to create a new character. You will be asked to enter the player name and the game will assign you a random character type
+* Enter option S to save the game at the current state of the character
+* Enter option R to resume the game from the last saved state of the character
+* Enter option X to exit the game
 
