@@ -54,7 +54,7 @@ public class DefaultMainMenuController implements MainMenuAPI {
             renderingService.success("Created character: " + character);
             return character;
         } catch (PlayerException | CharacterException | CharacterTypeException e) {
-            System.err.println(e.getMessage());
+            renderingService.error(e.getMessage());
         } catch (IOException e) {
             throw new MainMenuException(e.getMessage());
         }
@@ -72,7 +72,7 @@ public class DefaultMainMenuController implements MainMenuAPI {
             try {
                 checkpointFileManager.writeData(checkpoint);
             } catch (FileManagementException e) {
-                System.err.println(e.getMessage());
+                renderingService.error(e.getMessage());
             }
             renderingService.success("Checkpoint saved");
         } else {
@@ -92,7 +92,7 @@ public class DefaultMainMenuController implements MainMenuAPI {
                 renderingService.warn("No saved checkpoint available!");
             }
         } catch (FileManagementException e) {
-            System.err.println(e.getMessage());
+            renderingService.error(e.getMessage());
         }
         return optionalCheckpoint;
     }

@@ -11,7 +11,7 @@
 ---
 
 ### v1.1
-* Decorated with ASCII art
+* Decorated with ASCII art and ANSI colors
 * Save and resume checkpoint
 * File management
 * Test data source

@@ -8,6 +8,7 @@ public class DefaultStdoutRenderingImpl implements RenderingService {
     public static final String ANSI_GREEN = "\u001B[32m";
     public static final String ANSI_BLUE = "\u001B[34m";
     public static final String ANSI_YELLOW = "\u001B[33m";
+    public static final String ANSI_RED = "\u001B[31m";
 
     @Override
     public void info(String message) {
@@ -22,6 +23,11 @@ public class DefaultStdoutRenderingImpl implements RenderingService {
     @Override
     public void warn(String message) {
         System.out.println(ANSI_YELLOW + message + ANSI_RESET);
+    }
+
+    @Override
+    public void error(String message) {
+        System.out.println(ANSI_RED + message + ANSI_RESET);
     }
 
     private static volatile RenderingService INSTANCE;

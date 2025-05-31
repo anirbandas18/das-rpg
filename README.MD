@@ -19,7 +19,9 @@ mvn test -e
 ```
 java -jar target/das-fussball-rpg.jar
 ```
-*Note: Further instructions on how to play the game can be found in HELP.MD*
+
+## Usage
+You can find detailed instructions on how to play the game in HELP.MD 
 
 ## Extensibility of the project
 * Create new character types by adding new values in the CharacterType enum

@@ -8,4 +8,6 @@ public interface RenderingService {
 
     public void warn(String message);
 
+    public void error(String message);
+
 }

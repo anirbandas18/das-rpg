@@ -60,7 +60,7 @@ public class RPG {
                     }
                 }
                 case "X" -> mainMenuAPI.exitGame();
-                default -> System.err.println("Option " + option + " not supported. Try again!");
+                default -> renderingService.error("Option " + option + " not supported. Try again!");
             }
         }
     }
