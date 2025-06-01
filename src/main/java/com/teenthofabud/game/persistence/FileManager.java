@@ -5,6 +5,8 @@ import java.nio.file.FileSystem;
 
 public interface FileManager<T, K> {
 
+    public boolean isDataAvailable() throws FileManagementException;
+
     public T readData() throws FileManagementException;
 
     public void writeData(T data) throws FileManagementException;

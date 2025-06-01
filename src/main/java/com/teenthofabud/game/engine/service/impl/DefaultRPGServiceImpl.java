@@ -19,6 +19,7 @@ import com.teenthofabud.game.resources.player.Player;
 import com.teenthofabud.game.resources.player.PlayerException;
 import com.teenthofabud.game.resources.player.service.PlayerService;
 
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -26,16 +27,16 @@ import java.util.Optional;
 
 public class DefaultRPGServiceImpl implements RPGAPI {
 
-    private static final String MOVEMENT_MENU = """
+    private static final String EXPLORE_MENU = """
             ▐▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▌
-            ▐    Movement Menu    ▌
+            ▐       Explore       ▌
             ▐=====================▌
             ▐  U - Move up        ▌
             ▐  D - Move down      ▌
             ▐  L - Move left      ▌
             ▐  R - Move right     ▌
             ▐  S - Save position  ▌
-            ▐  X - Game menu      ▌
+            ▐  X - Back           ▌
             ▐▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▌
             """;
 
@@ -100,41 +101,47 @@ public class DefaultRPGServiceImpl implements RPGAPI {
     }
 
     @Override
-    public Optional<Checkpoint> resumeGame() {
+    public Optional<Checkpoint> resumeGame() throws RPGException {
         Optional<Checkpoint> optionalCheckpoint = Optional.empty();
-        renderingService.info("Resuming checkpoint....");
         try {
-            Checkpoint checkpoint = checkpointFileManager.readData();
-            renderingService.success("Resumed " + checkpoint.getCharacter() + " from checkpoint at (" + checkpoint.x() + ", " + checkpoint.y() + ") on map");
-            optionalCheckpoint = Optional.of(checkpoint);
+            if(checkpointFileManager.isDataAvailable()) {
+                renderingService.info("Resuming checkpoint....");
+                Checkpoint checkpoint = checkpointFileManager.readData();
+                renderingService.success("Resumed " + checkpoint.getCharacter() + " from checkpoint at (" + checkpoint.x() + ", " + checkpoint.y() + ") on map");
+                optionalCheckpoint = Optional.of(checkpoint);
+            }
         } catch (FileManagementException e) {
-            renderingService.error(e.getMessage());
+            throw new RPGException(e.getMessage());
         }
         return optionalCheckpoint;
     }
 
     @Override
-    public void deleteGame()  throws RPGException {
+    public boolean deleteGame()  throws RPGException {
         boolean flag = true;
         try {
-            while (flag) {
-                renderingService.warn("Are you sure you want to delete saved game? Y/N");
-                String option = stdin.readLine();
-                switch (option.toUpperCase()) {
-                    case "Y" -> {
-                        checkpointFileManager.clearData();
-                        renderingService.warn("Checkpoint deleted!");
-                        flag = false;
+            if(checkpointFileManager.isDataAvailable()) {
+                while (flag) {
+                    renderingService.warn("Are you sure you want to delete saved game? Y/N");
+                    String option = stdin.readLine();
+                    switch (option.toUpperCase()) {
+                        case "Y" -> {
+                            checkpointFileManager.clearData();
+                            renderingService.warn("Checkpoint deleted!");
+                            flag = false;
+                        }
+                        case "N" -> flag = false;
+                        default -> renderingService.error("Option " + option + " not supported. Try again!");
                     }
-                    case "N" -> flag = false;
-                    default -> renderingService.error("Option " + option + " not supported. Try again!");
                 }
+                return true;
             }
         } catch (IOException e) {
             throw new RPGException(e.getMessage());
         } catch (FileManagementException e) {
             renderingService.error(e.getMessage());
         }
+        return false;
     }
 
     @Override
@@ -147,13 +154,20 @@ public class DefaultRPGServiceImpl implements RPGAPI {
     public void explore(Map map, Checkpoint checkpoint) throws RPGException {
         boolean flag = true;
         try {
+            Point newPosition = new Point(checkpoint.x(), checkpoint.y());
             while(flag) {
-                renderingService.menu(MOVEMENT_MENU);
-                renderingService.grid(map.getMagnitude(), checkpoint.x(), checkpoint.y());
+                renderingService.menu(EXPLORE_MENU);
+                renderingService.grid(map.getMagnitude(), newPosition.x, newPosition.y);
                 String option = stdin.readLine();
                 switch (option.toUpperCase()) {
                     case "U", "D", "L", "R" -> {
-                        explorationService.move(map, option.toUpperCase(), checkpoint);
+                        newPosition = explorationService.move(map, option.toUpperCase(), checkpoint);
+                        checkpoint.x(newPosition.x);
+                        checkpoint.y(newPosition.y);
+                    }
+                    case "S" -> {
+                        saveGame(checkpoint);
+                        flag = false;
                     }
                     case "X" -> {
                         renderingService.info("Back to game menu....");

@@ -12,9 +12,9 @@ public interface RPGAPI {
 
     public void saveGame(Checkpoint checkpoint);
 
-    public Optional<Checkpoint> resumeGame();
+    public Optional<Checkpoint> resumeGame() throws RPGException;
 
-    public void deleteGame() throws RPGException;
+    public boolean deleteGame() throws RPGException;
 
     public void exitGame();
 

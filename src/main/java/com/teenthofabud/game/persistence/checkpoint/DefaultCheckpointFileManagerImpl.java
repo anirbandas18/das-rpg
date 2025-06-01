@@ -15,6 +15,11 @@ public class DefaultCheckpointFileManagerImpl implements FileManager<Checkpoint,
     private FileSystem fileSystem;
 
     @Override
+    public boolean isDataAvailable() throws FileManagementException {
+        return Files.exists(dataFilePath()) && !Files.isDirectory(dataFilePath());
+    }
+
+    @Override
     public Checkpoint readData() throws FileManagementException  {
         if(!Files.exists(dataFilePath())) {
             throw new FileManagementException("no save game available");

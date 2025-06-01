@@ -37,9 +37,9 @@ import java.util.Optional;
 
 public class DefaultMenuServiceEngineImpl implements MenuService {
 
-    private static final String GAME_MENU = """
+    private static final String PLAY_MENU = """
             ▐▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▌
-            ▐        Game Menu        ▌
+            ▐          Play           ▌
             ▐=========================▌
             ▐  C - Create character   ▌
             ▐  E - Explore            ▌
@@ -84,7 +84,7 @@ public class DefaultMenuServiceEngineImpl implements MenuService {
         RPGAPI.saveGame(optionalCheckpoint.get());
     }
 
-    private void exploration(Map map, Optional<Checkpoint> optionalCheckpoint) throws RPGException {
+    private void explore(Map map, Optional<Checkpoint> optionalCheckpoint) throws RPGException {
         if(optionalCheckpoint.isEmpty() || optionalCheckpoint.get().getCharacter() == null) {
             renderingService.warn("Please create a character or resume a saved game to start exploration");
         } else {
@@ -100,20 +100,39 @@ public class DefaultMenuServiceEngineImpl implements MenuService {
         return Optional.of(checkpoint);
     }
 
+    private void resumeGame(Optional<Checkpoint> oldCheckpoint) throws MapException, RPGException {
+        Optional<Checkpoint> newCheckpoint = RPGAPI.resumeGame();
+        if(newCheckpoint.isPresent()) {
+            Map map = mapMapService.getDefaultGrid();
+            explore(map, newCheckpoint);
+            oldCheckpoint = newCheckpoint;
+        } else {
+            renderingService.warn("No save game available");
+        }
+    }
+
+    private void deleteGame(Optional<Checkpoint> optionalCheckpoint) throws RPGException {
+        if(!RPGAPI.deleteGame()) {
+            renderingService.warn("No save game available");
+        } else {
+            optionalCheckpoint = Optional.empty();
+        }
+    }
+
     @Override
     public void play() throws MenuException {
         Optional<Checkpoint> optionalCheckpoint = Optional.empty();
         try {
             Map map = mapMapService.getDefaultGrid();
             while(true) {
-                renderingService.menu(GAME_MENU);
+                renderingService.menu(PLAY_MENU);
                 String option = stdin.readLine();
                 switch (option.toUpperCase()) {
                     case "C" -> optionalCheckpoint = createCharacter();
-                    case "E" -> exploration(map, optionalCheckpoint);
+                    case "E" -> explore(map, optionalCheckpoint);
                     case "S" -> saveGame(optionalCheckpoint);
-                    case "D" -> RPGAPI.deleteGame();
-                    case "R" -> optionalCheckpoint = RPGAPI.resumeGame();
+                    case "D" -> deleteGame(optionalCheckpoint);
+                    case "R" -> resumeGame(optionalCheckpoint);
                     case "X" -> RPGAPI.exitGame();
                     default -> renderingService.error("Option " + option + " not supported. Try again!");
                 }

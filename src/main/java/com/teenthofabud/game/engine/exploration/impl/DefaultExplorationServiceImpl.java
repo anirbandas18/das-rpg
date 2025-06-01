@@ -103,7 +103,7 @@ public class DefaultExplorationServiceImpl implements ExplorationService {
     }
 
     @Override
-    public void move(Map map, String movementKey, Checkpoint checkpoint) throws ExplorationException {
+    public Point move(Map map, String movementKey, Checkpoint checkpoint) throws ExplorationException {
         Point newPosition = new Point(0, 0);
         if(map == null) {
             throw new ExplorationException("map is required");
@@ -143,14 +143,14 @@ public class DefaultExplorationServiceImpl implements ExplorationService {
                         newPosition.x = checkpoint.x();
                     }
                 }
-                checkpoint.x(newPosition.x);
-                checkpoint.y(newPosition.y);
+            } else {
+                newPosition.y = checkpoint.y();
+                newPosition.x = checkpoint.x();
             }
-            /*checkpoint.x(newPosition.x);
-            checkpoint.y(newPosition.y);*/
         } catch (MovementException e) {
             renderingService.error(e.getMessage());
         }
+        return newPosition;
     }
 
     private static volatile ExplorationService INSTANCE;

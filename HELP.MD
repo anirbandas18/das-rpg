@@ -6,7 +6,7 @@ The in game menu is presented to the player with the following options on the co
 
 ```
             ▐▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▌
-            ▐        Game Menu        ▌
+            ▐          Play           ▌
             ▐=========================▌
             ▐  C - Create character   ▌
             ▐  E - Explore            ▌
@@ -36,14 +36,14 @@ The in game menu is presented to the player with the following options on the co
 
 ```
             ▐▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▌
-            ▐    Movement Menu    ▌
+            ▐       Explore       ▌
             ▐=====================▌
             ▐  U - Move up        ▌
             ▐  D - Move down      ▌
             ▐  L - Move left      ▌
             ▐  R - Move right     ▌
             ▐  S - Save position  ▌
-            ▐  X - Game menu      ▌
+            ▐  X - Back           ▌
             ▐▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▌
 ```
 

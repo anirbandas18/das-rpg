@@ -11,6 +11,18 @@ import java.util.Properties;
 public class DefaultConfigurationFileManagerImpl implements FileManager<Configuration, String> {
 
     @Override
+    public boolean isDataAvailable() throws FileManagementException {
+        try {
+            InputStream is = DefaultConfigurationFileManagerImpl.class.getClassLoader().getResourceAsStream(getFileName());
+            boolean available = is.available() > 0;
+            is.close();
+            return available;
+        } catch (IOException e) {
+            throw new FileManagementException(e.getMessage());
+        }
+    }
+
+    @Override
     public Configuration readData() throws FileManagementException  {
         try {
             InputStream is = DefaultConfigurationFileManagerImpl.class.getClassLoader().getResourceAsStream(getFileName());
@@ -23,6 +35,7 @@ public class DefaultConfigurationFileManagerImpl implements FileManager<Configur
                     .defaultMagnitudeOfGridMap(Integer.valueOf(prop.getProperty("map.grid.magnitude")))
                     .defaultNameOfGridMap(prop.getProperty("map.grid.name"))
                     .build();
+            is.close();
             return defaultConfigurations;
         } catch (IOException |  NumberFormatException e) {
             throw new FileManagementException(e.getMessage());

@@ -124,6 +124,7 @@ public class MenuControllerTest implements TestDataSourceProvider {
     @Test
     public void testResumeGameIsSuccessful() {
         assertDoesNotThrow(() -> {
+            when(FILE_MANAGER_SERVICE.isDataAvailable()).thenReturn(true);
             when(FILE_MANAGER_SERVICE.readData()).thenReturn(checkpoint);
 
             Optional<Checkpoint> actualOptionalCheckpoint = MENU_API.resumeGame();
