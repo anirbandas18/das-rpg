@@ -1,4 +1,4 @@
-package com.teenthofabud.game.resources.checkpoint;
+package com.teenthofabud.game.persistence.checkpoint;
 
 import com.teenthofabud.game.resources.character.Character;
 

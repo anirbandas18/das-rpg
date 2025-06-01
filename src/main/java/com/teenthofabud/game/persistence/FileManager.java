@@ -1,14 +1,9 @@
-package com.teenthofabud.game.persistence.repository;
-
-import com.teenthofabud.game.persistence.FileManagementException;
+package com.teenthofabud.game.persistence;
 
 import java.io.*;
 import java.nio.file.FileSystem;
-import java.nio.file.Path;
 
-public interface FileManager<T> {
-
-    static final String DATA_DIRECTORY_NAME = "das-rpg";
+public interface FileManager<T, K> {
 
     public T readData() throws FileManagementException;
 
@@ -20,13 +15,9 @@ public interface FileManager<T> {
 
     public FileSystem getFileSystem();
 
-    default Path dataFilePath() {
-        return dataDirectoryPath().resolve(getFileName());
-    }
+    public K dataFilePath();
 
-    default Path dataDirectoryPath() {
-        return getFileSystem().getPath(DATA_DIRECTORY_NAME);
-    }
+    public K dataDirectoryPath();
 
     default byte[] serialize(Object object) throws FileManagementException {
         try {

@@ -6,7 +6,7 @@ import com.teenthofabud.game.constants.movement.service.MovementService;
 import com.teenthofabud.game.engine.exploration.ExplorationException;
 import com.teenthofabud.game.engine.exploration.ExplorationService;
 import com.teenthofabud.game.engine.renderer.RenderingService;
-import com.teenthofabud.game.resources.checkpoint.Checkpoint;
+import com.teenthofabud.game.persistence.checkpoint.Checkpoint;
 import com.teenthofabud.game.resources.map.Map;
 
 import java.awt.*;
@@ -17,16 +17,20 @@ public class DefaultExplorationServiceImpl implements ExplorationService {
     private RenderingService renderingService;
     private MovementService movementService;
 
+    private void render(String characterName, String movementName, String mapName) {
+        renderingService.error(characterName + " can't explore " + movementName + " on map " + mapName);
+    }
+
     private boolean possibleToMoveUpOrLeftFromTopLeftCorner(Movement movement, Checkpoint checkpoint, Map map) {
         boolean flag = true;
         if(checkpoint.x() == 0 && checkpoint.y() == 0) {
             if(movement.compareTo(Movement.UP) == 0) {
                 flag = false;
-                renderingService.error("not possible upwards by " + checkpoint.getCharacter() + " on map " + map.getName());
+                render(checkpoint.getCharacter().getPlayer().getName(), movement.name(), map.getName());
             }
             if(movement.compareTo(Movement.LEFT) == 0) {
                 flag = false;
-                renderingService.error("not possible to the left by " + checkpoint.getCharacter() + " on map " + map.getName());
+                render(checkpoint.getCharacter().getPlayer().getName(), movement.name(), map.getName());
             }
         }
         return flag;
@@ -37,11 +41,11 @@ public class DefaultExplorationServiceImpl implements ExplorationService {
         if(checkpoint.x() == 0 && checkpoint.y() == map.getMagnitude() - 1) {
             if(movement.compareTo(Movement.UP) == 0) {
                 flag = false;
-                renderingService.error("not possible upwards by " + checkpoint.getCharacter() + " on map " + map.getName());
+                render(checkpoint.getCharacter().getPlayer().getName(), movement.name(), map.getName());
             }
             if(movement.compareTo(Movement.RIGHT) == 0) {
                 flag = false;
-                renderingService.error("not possible to the right by " + checkpoint.getCharacter() + " on map " + map.getName());
+                render(checkpoint.getCharacter().getPlayer().getName(), movement.name(), map.getName());
             }
         }
         return flag;
@@ -52,11 +56,11 @@ public class DefaultExplorationServiceImpl implements ExplorationService {
         if(checkpoint.x() == map.getMagnitude() - 1 && checkpoint.y() == 0) {
             if(movement.compareTo(Movement.DOWN) == 0) {
                 flag = false;
-                renderingService.error("not possible downwards by " + checkpoint.getCharacter() + " on map " + map.getName());
+                render(checkpoint.getCharacter().getPlayer().getName(), movement.name(), map.getName());
             }
             if(movement.compareTo(Movement.LEFT) == 0) {
                 flag = false;
-                renderingService.error("not possible to the left by " + checkpoint.getCharacter() + " on map " + map.getName());
+                render(checkpoint.getCharacter().getPlayer().getName(), movement.name(), map.getName());
             }
         }
         return flag;
@@ -67,11 +71,11 @@ public class DefaultExplorationServiceImpl implements ExplorationService {
         if(checkpoint.x() == map.getMagnitude() - 1 && checkpoint.y() == map.getMagnitude() - 1) {
             if(movement.compareTo(Movement.DOWN) == 0) {
                 flag = false;
-                renderingService.error("not possible downwards by " + checkpoint.getCharacter() + " on map " + map.getName());
+                render(checkpoint.getCharacter().getPlayer().getName(), movement.name(), map.getName());
             }
             if(movement.compareTo(Movement.RIGHT) == 0) {
                 flag = false;
-                renderingService.error("not possible to the right by " + checkpoint.getCharacter() + " on map " + map.getName());
+                render(checkpoint.getCharacter().getPlayer().getName(), movement.name(), map.getName());
             }
         }
         return flag;
@@ -81,19 +85,19 @@ public class DefaultExplorationServiceImpl implements ExplorationService {
         boolean flag = false;
         if(checkpoint.x() == 0 && checkpoint.y() > 0 && checkpoint.y() < map.getMagnitude() - 1 && movement.compareTo(Movement.UP) == 0) {
             flag = true;
-            renderingService.error("not possible upwards by " + checkpoint.getCharacter() + " on map " + map.getName());
+            render(checkpoint.getCharacter().getPlayer().getName(), movement.name(), map.getName());
         }
         if(checkpoint.x() == map.getMagnitude() - 1 && checkpoint.y() > 0 && checkpoint.y() < map.getMagnitude() - 1 && movement.compareTo(Movement.DOWN) == 0) {
             flag = true;
-            renderingService.error("not possible downwards by " + checkpoint.getCharacter() + " on map " + map.getName());
+            render(checkpoint.getCharacter().getPlayer().getName(), movement.name(), map.getName());
         }
         if(checkpoint.y() == 0 && checkpoint.x() > 0 && checkpoint.x() < map.getMagnitude() - 1 && movement.compareTo(Movement.LEFT) == 0) {
             flag = true;
-            renderingService.error("not possible to the left by " + checkpoint.getCharacter() + " on map " + map.getName());
+            render(checkpoint.getCharacter().getPlayer().getName(), movement.name(), map.getName());
         }
         if(checkpoint.y() == map.getMagnitude() - 1 && checkpoint.x() > 0 && checkpoint.x() < map.getMagnitude() - 1 && movement.compareTo(Movement.RIGHT) == 0) {
             flag = true;
-            renderingService.error("not possible to the right by " + checkpoint.getCharacter() + " on map " + map.getName());
+            render(checkpoint.getCharacter().getPlayer().getName(), movement.name(), map.getName());
         }
         return flag;
     }
@@ -135,13 +139,15 @@ public class DefaultExplorationServiceImpl implements ExplorationService {
                         newPosition.x = checkpoint.x();
                     }
                     case RIGHT -> {
-                        newPosition.y = checkpoint.x() + 1;
+                        newPosition.y = checkpoint.y() + 1;
                         newPosition.x = checkpoint.x();
                     }
                 }
+                checkpoint.x(newPosition.x);
+                checkpoint.y(newPosition.y);
             }
-            checkpoint.x(newPosition.x);
-            checkpoint.y(newPosition.y);
+            /*checkpoint.x(newPosition.x);
+            checkpoint.y(newPosition.y);*/
         } catch (MovementException e) {
             renderingService.error(e.getMessage());
         }

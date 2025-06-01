@@ -1,25 +1,28 @@
-package com.teenthofabud.game.engine.rpg.impl;
+package com.teenthofabud.game.engine.controller.impl;
 
 import com.teenthofabud.game.constants.charactertype.service.CharacterTypeService;
 import com.teenthofabud.game.constants.charactertype.service.impl.DefaultCharacterTypeServiceImpl;
 import com.teenthofabud.game.constants.movement.service.MovementService;
 import com.teenthofabud.game.constants.movement.service.impl.DefaultMovementServiceImpl;
-import com.teenthofabud.game.engine.controller.MenuAPI;
-import com.teenthofabud.game.engine.controller.MenuException;
-import com.teenthofabud.game.engine.controller.impl.DefaultMenuControllerImpl;
+import com.teenthofabud.game.engine.service.RPGAPI;
+import com.teenthofabud.game.engine.service.RPGException;
+import com.teenthofabud.game.engine.service.impl.DefaultRPGServiceImpl;
 import com.teenthofabud.game.engine.exploration.ExplorationService;
 import com.teenthofabud.game.engine.exploration.impl.DefaultExplorationServiceImpl;
-import com.teenthofabud.game.engine.rpg.RPGService;
-import com.teenthofabud.game.engine.rpg.RPGException;
-import com.teenthofabud.game.persistence.repository.FileManager;
-import com.teenthofabud.game.persistence.repository.impl.DefaultCheckpointFileManagerImpl;
+import com.teenthofabud.game.engine.controller.MenuService;
+import com.teenthofabud.game.engine.controller.MenuException;
+import com.teenthofabud.game.persistence.configuration.Configuration;
+import com.teenthofabud.game.persistence.FileManager;
+import com.teenthofabud.game.persistence.checkpoint.DefaultCheckpointFileManagerImpl;
 import com.teenthofabud.game.engine.renderer.RenderingService;
 import com.teenthofabud.game.engine.renderer.impl.DefaultStdoutRenderingImpl;
+import com.teenthofabud.game.persistence.configuration.DefaultConfigurationFileManagerImpl;
 import com.teenthofabud.game.resources.character.Character;
 import com.teenthofabud.game.resources.character.service.CharacterService;
 import com.teenthofabud.game.resources.character.service.impl.DefaultCharacterServiceImpl;
-import com.teenthofabud.game.resources.checkpoint.Checkpoint;
+import com.teenthofabud.game.persistence.checkpoint.Checkpoint;
 import com.teenthofabud.game.resources.map.Map;
+import com.teenthofabud.game.resources.map.MapException;
 import com.teenthofabud.game.resources.map.service.MapService;
 import com.teenthofabud.game.resources.map.service.impl.DefaultMapServiceImpl;
 import com.teenthofabud.game.resources.player.service.PlayerService;
@@ -29,9 +32,10 @@ import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Path;
 import java.util.Optional;
 
-public class DefaultRPGServiceEngineImpl implements RPGService {
+public class DefaultMenuServiceEngineImpl implements MenuService {
 
     private static final String GAME_MENU = """
             ▐▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▌
@@ -47,86 +51,90 @@ public class DefaultRPGServiceEngineImpl implements RPGService {
             """;
 
     private BufferedReader stdin;
-    private FileManager<Checkpoint> checkpointFileManager;
+    private FileManager<Checkpoint, Path> checkpointFileManager;
     private PlayerService playerService;
     private CharacterTypeService characterTypeService;
     private CharacterService characterService;
     private RenderingService renderingService;
-    private MenuAPI menuAPI;
+    private RPGAPI RPGAPI;
     private MapService mapMapService;
     private MovementService movementService;
     private ExplorationService explorationService;
+    private FileManager<Configuration, String> configurationFileManager;
 
-    private DefaultRPGServiceEngineImpl() {
+    private DefaultMenuServiceEngineImpl() {
         this.stdin = new BufferedReader(new InputStreamReader(System.in));
         this.checkpointFileManager = DefaultCheckpointFileManagerImpl.getInstance(Optional.empty());
         this.playerService = DefaultPlayerServiceImpl.getInstance();
         this.characterTypeService = DefaultCharacterTypeServiceImpl.getInstance();
         this.characterService = DefaultCharacterServiceImpl.getInstance();
         this.renderingService = DefaultStdoutRenderingImpl.getInstance();
-        this.mapMapService = DefaultMapServiceImpl.getInstance(renderingService);
+        this.configurationFileManager = DefaultConfigurationFileManagerImpl.getInstance();
+        this.mapMapService = DefaultMapServiceImpl.getInstance(configurationFileManager);
         this.movementService = DefaultMovementServiceImpl.getInstance();
         this.explorationService = DefaultExplorationServiceImpl.getInstance(renderingService, movementService);
-        this.menuAPI = DefaultMenuControllerImpl.getInstance(stdin, playerService, characterTypeService, characterService, checkpointFileManager, renderingService, explorationService);
+        this.RPGAPI = DefaultRPGServiceImpl.getInstance(stdin, playerService, characterTypeService, characterService, checkpointFileManager, renderingService, explorationService);
     }
 
-    @Deprecated
-    private void save(Character character) {
-        Checkpoint checkpoint = new Checkpoint.Builder().character(character).build();
-        menuAPI.saveGame(checkpoint);
+    private void saveGame(Optional<Checkpoint> optionalCheckpoint) {
+        if(optionalCheckpoint.isEmpty()) {
+            renderingService.warn("No character or progress to save");
+            return;
+        }
+        RPGAPI.saveGame(optionalCheckpoint.get());
     }
 
-    private void save(Character character, Point point) {
-        Checkpoint checkpoint = new Checkpoint.Builder().character(character).x(point.x).y(point.y).build();
-        menuAPI.saveGame(checkpoint);
-    }
-
-    private void exploration(Map map, Optional<Checkpoint> optionalCheckpoint) throws MenuException {
+    private void exploration(Map map, Optional<Checkpoint> optionalCheckpoint) throws RPGException {
         if(optionalCheckpoint.isEmpty() || optionalCheckpoint.get().getCharacter() == null) {
             renderingService.warn("Please create a character or resume a saved game to start exploration");
         } else {
             Checkpoint checkpoint = optionalCheckpoint.get();
-            menuAPI.explore(map, checkpoint);
+            RPGAPI.explore(map, checkpoint);
         }
     }
 
-    @Override
-    public void play() throws RPGException {
-        Character character = null;
+    private Optional<Checkpoint> createCharacter() throws RPGException {
+        Character character = RPGAPI.createCharacter();
         Point point = new Point();
+        Checkpoint checkpoint = new Checkpoint.Builder().character(character).x(point.x).y(point.y).build();
+        return Optional.of(checkpoint);
+    }
+
+    @Override
+    public void play() throws MenuException {
         Optional<Checkpoint> optionalCheckpoint = Optional.empty();
-        Map map = mapMapService.get10xGrid();
         try {
+            Map map = mapMapService.getDefaultGrid();
             while(true) {
                 renderingService.menu(GAME_MENU);
                 String option = stdin.readLine();
                 switch (option.toUpperCase()) {
-                    case "C" -> character = menuAPI.createCharacter();
+                    case "C" -> optionalCheckpoint = createCharacter();
                     case "E" -> exploration(map, optionalCheckpoint);
-                    case "S" -> save(character, point);
-                    case "D" -> menuAPI.deleteGame();
-                    case "R" -> optionalCheckpoint = menuAPI.resumeGame();
-                    case "X" -> menuAPI.exitGame();
+                    case "S" -> saveGame(optionalCheckpoint);
+                    case "D" -> RPGAPI.deleteGame();
+                    case "R" -> optionalCheckpoint = RPGAPI.resumeGame();
+                    case "X" -> RPGAPI.exitGame();
                     default -> renderingService.error("Option " + option + " not supported. Try again!");
                 }
             }
         } catch (IOException e) {
-            throw new RPGException(e.getClass().getSimpleName() + ": " + e);
-        } catch (MenuException e) {
-            renderingService.error("Driver failure: " + e.getMessage());
+            throw new MenuException(e.getMessage());
+        } catch (RPGException | MapException e) {
+            renderingService.error("RPG failure: " + e.getMessage());
         }
     }
 
-    private static volatile RPGService INSTANCE;
+    private static volatile MenuService INSTANCE;
 
-    public static RPGService getInstance() {
-        RPGService result = INSTANCE;
+    public static MenuService getInstance() {
+        MenuService result = INSTANCE;
         if (result != null) {
             return result;
         }
-        synchronized(DefaultRPGServiceEngineImpl.class) {
+        synchronized(DefaultMenuServiceEngineImpl.class) {
             if (INSTANCE == null) {
-                INSTANCE = new DefaultRPGServiceEngineImpl();
+                INSTANCE = new DefaultMenuServiceEngineImpl();
             }
             return INSTANCE;
         }

@@ -1,38 +1,43 @@
 package com.teenthofabud.game.resources.map.service.impl;
 
-import com.teenthofabud.game.engine.renderer.RenderingService;
+import com.teenthofabud.game.persistence.FileManagementException;
+import com.teenthofabud.game.persistence.configuration.Configuration;
+import com.teenthofabud.game.persistence.FileManager;
 import com.teenthofabud.game.resources.map.Map;
-import com.teenthofabud.game.resources.map.model.GridMap10x;
+import com.teenthofabud.game.resources.map.MapException;
+import com.teenthofabud.game.resources.map.model.GridMap;
 import com.teenthofabud.game.resources.map.service.MapService;
 
 public class DefaultMapServiceImpl implements MapService {
 
-    private static final int MAGNITUDE = 10;
+    private FileManager<Configuration, String> configurationFileManager;
 
-    private RenderingService renderingService;
-
-    private DefaultMapServiceImpl(RenderingService renderingService) {
-        this.renderingService = renderingService;
-    }
-
-    @Override
-    public Map get10xGrid() {
-        return new GridMap10x.Builder().magnitude(MAGNITUDE).build();
+    private DefaultMapServiceImpl(FileManager<Configuration, String> configurationFileManager) {
+        this.configurationFileManager = configurationFileManager;
     }
 
     private static volatile MapService INSTANCE;
 
-    public static MapService getInstance(RenderingService renderingService) {
+    public static MapService getInstance(FileManager<Configuration, String> configurationFileManager) {
         MapService result = INSTANCE;
         if (result != null) {
             return result;
         }
         synchronized(DefaultMapServiceImpl.class) {
             if (INSTANCE == null) {
-                INSTANCE = new DefaultMapServiceImpl(renderingService);
+                INSTANCE = new DefaultMapServiceImpl(configurationFileManager);
             }
             return INSTANCE;
         }
     }
 
+    @Override
+    public Map getDefaultGrid() throws MapException {
+        try {
+            Configuration configuration = configurationFileManager.readData();
+            return new GridMap.Builder().name(configuration.getDefaultNameOfGridMap()).magnitude(configuration.getDefaultMagnitudeOfGridMap()).build();
+        } catch (FileManagementException e) {
+            throw new MapException(e.getMessage());
+        }
+    }
 }

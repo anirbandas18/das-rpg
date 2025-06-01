@@ -1,16 +1,16 @@
 package com.teenthofabud.game;
 
-import com.teenthofabud.game.engine.rpg.RPGService;
-import com.teenthofabud.game.engine.rpg.RPGException;
-import com.teenthofabud.game.engine.rpg.impl.DefaultRPGServiceEngineImpl;
+import com.teenthofabud.game.engine.controller.MenuService;
+import com.teenthofabud.game.engine.controller.MenuException;
+import com.teenthofabud.game.engine.controller.impl.DefaultMenuServiceEngineImpl;
 
 public class Driver {
 
     public static void main(String[] args) {
         try {
-            RPGService game = DefaultRPGServiceEngineImpl.getInstance();
+            MenuService game = DefaultMenuServiceEngineImpl.getInstance();
             game.play();
-        } catch (RPGException e) {
+        } catch (MenuException e) {
             System.err.println("Driver failure: " + e.getMessage());
         }
     }

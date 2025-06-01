@@ -1,19 +1,19 @@
-package com.teenthofabud.game.engine.controller.impl;
+package com.teenthofabud.game.engine.service.impl;
 
 import com.teenthofabud.game.constants.charactertype.CharacterType;
 import com.teenthofabud.game.constants.charactertype.CharacterTypeException;
 import com.teenthofabud.game.constants.charactertype.service.CharacterTypeService;
-import com.teenthofabud.game.engine.controller.MenuException;
-import com.teenthofabud.game.engine.controller.MenuAPI;
+import com.teenthofabud.game.engine.service.RPGException;
+import com.teenthofabud.game.engine.service.RPGAPI;
 import com.teenthofabud.game.engine.exploration.ExplorationException;
 import com.teenthofabud.game.engine.exploration.ExplorationService;
 import com.teenthofabud.game.persistence.FileManagementException;
-import com.teenthofabud.game.persistence.repository.FileManager;
+import com.teenthofabud.game.persistence.FileManager;
 import com.teenthofabud.game.engine.renderer.RenderingService;
 import com.teenthofabud.game.resources.character.Character;
 import com.teenthofabud.game.resources.character.CharacterException;
 import com.teenthofabud.game.resources.character.service.CharacterService;
-import com.teenthofabud.game.resources.checkpoint.Checkpoint;
+import com.teenthofabud.game.persistence.checkpoint.Checkpoint;
 import com.teenthofabud.game.resources.map.Map;
 import com.teenthofabud.game.resources.player.Player;
 import com.teenthofabud.game.resources.player.PlayerException;
@@ -21,9 +21,10 @@ import com.teenthofabud.game.resources.player.service.PlayerService;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Optional;
 
-public class DefaultMenuControllerImpl implements MenuAPI {
+public class DefaultRPGServiceImpl implements RPGAPI {
 
     private static final String MOVEMENT_MENU = """
             ▐▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▌
@@ -41,17 +42,17 @@ public class DefaultMenuControllerImpl implements MenuAPI {
     private PlayerService playerService;
     private CharacterTypeService characterTypeService;
     private CharacterService characterService;
-    private FileManager<Checkpoint> checkpointFileManager;
+    private FileManager<Checkpoint, Path> checkpointFileManager;
     private RenderingService renderingService;
     private ExplorationService explorationService;
 
-    private DefaultMenuControllerImpl(BufferedReader stdin,
-                                      PlayerService playerService,
-                                      CharacterTypeService characterTypeService,
-                                      CharacterService characterService,
-                                      FileManager<Checkpoint> checkpointFileManager,
-                                      RenderingService renderingService,
-                                      ExplorationService explorationService) {
+    private DefaultRPGServiceImpl(BufferedReader stdin,
+                                  PlayerService playerService,
+                                  CharacterTypeService characterTypeService,
+                                  CharacterService characterService,
+                                  FileManager<Checkpoint, Path> checkpointFileManager,
+                                  RenderingService renderingService,
+                                  ExplorationService explorationService) {
         this.stdin = stdin;
         this.playerService = playerService;
         this.characterTypeService = characterTypeService;
@@ -62,7 +63,7 @@ public class DefaultMenuControllerImpl implements MenuAPI {
     }
 
     @Override
-    public Character createCharacter() throws MenuException {
+    public Character createCharacter() throws RPGException {
         Character character = null;
         try {
             renderingService.info("Enter player name: ");
@@ -73,7 +74,7 @@ public class DefaultMenuControllerImpl implements MenuAPI {
         } catch (PlayerException | CharacterException | CharacterTypeException e) {
             renderingService.error(e.getMessage());
         } catch (IOException e) {
-            throw new MenuException(e.getMessage());
+            throw new RPGException(e.getMessage());
         }
         return character;
     }
@@ -107,13 +108,12 @@ public class DefaultMenuControllerImpl implements MenuAPI {
             optionalCheckpoint = Optional.of(checkpoint);
         } catch (FileManagementException e) {
             renderingService.error(e.getMessage());
-            renderingService.warn("No saved checkpoint available!");
         }
         return optionalCheckpoint;
     }
 
     @Override
-    public void deleteGame()  throws MenuException {
+    public void deleteGame()  throws RPGException {
         boolean flag = true;
         try {
             while (flag) {
@@ -130,7 +130,7 @@ public class DefaultMenuControllerImpl implements MenuAPI {
                 }
             }
         } catch (IOException e) {
-            throw new MenuException(e.getMessage());
+            throw new RPGException(e.getMessage());
         } catch (FileManagementException e) {
             renderingService.error(e.getMessage());
         }
@@ -143,7 +143,7 @@ public class DefaultMenuControllerImpl implements MenuAPI {
     }
 
     @Override
-    public void explore(Map map, Checkpoint checkpoint) throws MenuException {
+    public void explore(Map map, Checkpoint checkpoint) throws RPGException {
         boolean flag = true;
         try {
             while(flag) {
@@ -164,26 +164,26 @@ public class DefaultMenuControllerImpl implements MenuAPI {
         } catch (ExplorationException e) {
             renderingService.error(e.getMessage());
         } catch (IOException e) {
-            throw new MenuException(e.getMessage());
+            throw new RPGException(e.getMessage());
         }
     }
 
-    private static volatile MenuAPI INSTANCE;
+    private static volatile RPGAPI INSTANCE;
 
-    public static MenuAPI getInstance(BufferedReader stdin,
-                                      PlayerService playerService,
-                                      CharacterTypeService characterTypeService,
-                                      CharacterService characterService,
-                                      FileManager<Checkpoint> checkpointFileManager,
-                                      RenderingService renderingService,
-                                      ExplorationService explorationService) {
-        MenuAPI result = INSTANCE;
+    public static RPGAPI getInstance(BufferedReader stdin,
+                                     PlayerService playerService,
+                                     CharacterTypeService characterTypeService,
+                                     CharacterService characterService,
+                                     FileManager<Checkpoint, Path> checkpointFileManager,
+                                     RenderingService renderingService,
+                                     ExplorationService explorationService) {
+        RPGAPI result = INSTANCE;
         if (result != null) {
             return result;
         }
-        synchronized(DefaultMenuControllerImpl.class) {
+        synchronized(DefaultRPGServiceImpl.class) {
             if (INSTANCE == null) {
-                INSTANCE = new DefaultMenuControllerImpl(stdin, playerService, characterTypeService, characterService, checkpointFileManager, renderingService, explorationService);
+                INSTANCE = new DefaultRPGServiceImpl(stdin, playerService, characterTypeService, characterService, checkpointFileManager, renderingService, explorationService);
             }
             return INSTANCE;
         }

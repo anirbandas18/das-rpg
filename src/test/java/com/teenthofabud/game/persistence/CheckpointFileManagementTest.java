@@ -4,10 +4,9 @@ import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
 import com.teenthofabud.game.TestDataSourceProvider;
 import com.teenthofabud.game.constants.charactertype.CharacterType;
-import com.teenthofabud.game.persistence.repository.impl.DefaultCheckpointFileManagerImpl;
-import com.teenthofabud.game.persistence.repository.FileManager;
+import com.teenthofabud.game.persistence.checkpoint.DefaultCheckpointFileManagerImpl;
 import com.teenthofabud.game.resources.character.Character;
-import com.teenthofabud.game.resources.checkpoint.Checkpoint;
+import com.teenthofabud.game.persistence.checkpoint.Checkpoint;
 import org.junit.jupiter.api.*;
 
 import java.io.IOException;
@@ -21,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
 public class CheckpointFileManagementTest implements TestDataSourceProvider {
 
-    private static FileManager<Checkpoint> CHECKPOINT_FILE_MANAGER;
+    private static FileManager<Checkpoint, Path> CHECKPOINT_FILE_MANAGER;
     private static FileSystem FILE_SYSTEM;
 
     private Checkpoint checkpoint;

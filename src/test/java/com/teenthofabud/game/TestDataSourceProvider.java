@@ -2,7 +2,7 @@ package com.teenthofabud.game;
 
 import com.teenthofabud.game.constants.charactertype.CharacterType;
 import com.teenthofabud.game.resources.character.Character;
-import com.teenthofabud.game.resources.checkpoint.Checkpoint;
+import com.teenthofabud.game.persistence.checkpoint.Checkpoint;
 import com.teenthofabud.game.resources.player.Player;
 
 import java.util.UUID;

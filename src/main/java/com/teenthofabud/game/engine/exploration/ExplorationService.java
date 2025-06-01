@@ -1,6 +1,6 @@
 package com.teenthofabud.game.engine.exploration;
 
-import com.teenthofabud.game.resources.checkpoint.Checkpoint;
+import com.teenthofabud.game.persistence.checkpoint.Checkpoint;
 import com.teenthofabud.game.resources.map.Map;
 
 public interface ExplorationService {

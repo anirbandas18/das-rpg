@@ -1,15 +1,16 @@
-package com.teenthofabud.game.persistence.repository.impl;
+package com.teenthofabud.game.persistence.checkpoint;
 
 import com.teenthofabud.game.persistence.FileManagementException;
-import com.teenthofabud.game.persistence.repository.FileManager;
-import com.teenthofabud.game.resources.checkpoint.Checkpoint;
+import com.teenthofabud.game.persistence.FileManager;
+
 import java.io.IOException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
 
-public class DefaultCheckpointFileManagerImpl implements FileManager<Checkpoint> {
+public class DefaultCheckpointFileManagerImpl implements FileManager<Checkpoint, Path> {
 
     private FileSystem fileSystem;
 
@@ -73,7 +74,15 @@ public class DefaultCheckpointFileManagerImpl implements FileManager<Checkpoint>
         return this.fileSystem;
     }
 
-    private static volatile FileManager<Checkpoint> INSTANCE;
+    public Path dataFilePath() {
+        return dataDirectoryPath().resolve(getFileName());
+    }
+
+    public Path dataDirectoryPath() {
+        return getFileSystem().getPath("das-rpg");
+    }
+
+    private static volatile FileManager<Checkpoint, Path> INSTANCE;
 
     private DefaultCheckpointFileManagerImpl(FileSystem fileSystem) {
         this.fileSystem = fileSystem;
@@ -83,8 +92,8 @@ public class DefaultCheckpointFileManagerImpl implements FileManager<Checkpoint>
         this.fileSystem = FileSystems.getDefault();
     }
 
-    public static FileManager<Checkpoint> getInstance(Optional<FileSystem> fileSystem) {
-        FileManager<Checkpoint> result = INSTANCE;
+    public static FileManager<Checkpoint, Path> getInstance(Optional<FileSystem> fileSystem) {
+        FileManager<Checkpoint, Path> result = INSTANCE;
         if (result != null) {
             return result;
         }

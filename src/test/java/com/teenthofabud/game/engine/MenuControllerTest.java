@@ -5,17 +5,17 @@ import com.teenthofabud.game.constants.charactertype.CharacterType;
 import com.teenthofabud.game.constants.charactertype.service.CharacterTypeService;
 import com.teenthofabud.game.constants.movement.service.MovementService;
 import com.teenthofabud.game.constants.movement.service.impl.DefaultMovementServiceImpl;
-import com.teenthofabud.game.engine.controller.MenuAPI;
-import com.teenthofabud.game.engine.controller.MenuException;
-import com.teenthofabud.game.engine.controller.impl.DefaultMenuControllerImpl;
+import com.teenthofabud.game.engine.service.RPGAPI;
+import com.teenthofabud.game.engine.service.RPGException;
+import com.teenthofabud.game.engine.service.impl.DefaultRPGServiceImpl;
 import com.teenthofabud.game.engine.exploration.ExplorationService;
 import com.teenthofabud.game.engine.exploration.impl.DefaultExplorationServiceImpl;
 import com.teenthofabud.game.engine.renderer.RenderingService;
 import com.teenthofabud.game.engine.renderer.impl.DefaultStdoutRenderingImpl;
-import com.teenthofabud.game.persistence.repository.FileManager;
+import com.teenthofabud.game.persistence.FileManager;
 import com.teenthofabud.game.resources.character.Character;
 import com.teenthofabud.game.resources.character.service.CharacterService;
-import com.teenthofabud.game.resources.checkpoint.Checkpoint;
+import com.teenthofabud.game.persistence.checkpoint.Checkpoint;
 import com.teenthofabud.game.resources.player.Player;
 import com.teenthofabud.game.resources.player.PlayerException;
 import com.teenthofabud.game.resources.player.service.PlayerService;
@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -35,12 +36,12 @@ import static org.mockito.Mockito.*;
 
 public class MenuControllerTest implements TestDataSourceProvider {
 
-    private static MenuAPI MENU_API;
+    private static RPGAPI MENU_API;
     private static BufferedReader STDIN;
     private static PlayerService PLAYER_SERVICE;
     private static CharacterTypeService CHARACTER_TYPE_SERVICE;
     private static CharacterService CHARACTER_SERVICE;
-    private static FileManager<Checkpoint> FILE_MANAGER_SERVICE;
+    private static FileManager<Checkpoint, Path> FILE_MANAGER_SERVICE;
     private static RenderingService RENDERING_SERVICE;
     private static MovementService MOVEMENT_SERVICE;
     private static ExplorationService EXPLORATION_SERVICE;
@@ -75,7 +76,7 @@ public class MenuControllerTest implements TestDataSourceProvider {
         RENDERING_SERVICE = DefaultStdoutRenderingImpl.getInstance();
         MOVEMENT_SERVICE = DefaultMovementServiceImpl.getInstance();
         EXPLORATION_SERVICE = DefaultExplorationServiceImpl.getInstance(RENDERING_SERVICE, MOVEMENT_SERVICE);
-        MENU_API = DefaultMenuControllerImpl.getInstance(STDIN, PLAYER_SERVICE, CHARACTER_TYPE_SERVICE, CHARACTER_SERVICE, FILE_MANAGER_SERVICE, RENDERING_SERVICE, EXPLORATION_SERVICE);
+        MENU_API = DefaultRPGServiceImpl.getInstance(STDIN, PLAYER_SERVICE, CHARACTER_TYPE_SERVICE, CHARACTER_SERVICE, FILE_MANAGER_SERVICE, RENDERING_SERVICE, EXPLORATION_SERVICE);
     }
 
     @Test
@@ -94,7 +95,7 @@ public class MenuControllerTest implements TestDataSourceProvider {
 
     @Test
     public void testCreateCharacterSystemFailure() {
-        assertThrowsExactly(MenuException.class, () -> {
+        assertThrowsExactly(RPGException.class, () -> {
             when(STDIN.readLine()).thenThrow(new IOException("STDIN Simulation"));
             MENU_API.createCharacter();
         });
