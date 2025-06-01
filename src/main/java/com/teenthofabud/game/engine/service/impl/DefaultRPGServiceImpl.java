@@ -113,7 +113,7 @@ public class DefaultRPGServiceImpl implements RPGAPI {
     }
 
     @Override
-    public void resumeGame() throws RPGException {
+    public boolean resumeGame() throws RPGException {
         try {
             if(checkpointFileManager.isDataAvailable()) {
                 renderingService.info("Resuming checkpoint....");
@@ -122,8 +122,10 @@ public class DefaultRPGServiceImpl implements RPGAPI {
                 currentPosition.x = checkpoint.x();
                 currentPosition.y = checkpoint.y();
                 renderingService.success("Resumed " + checkpoint.getCharacter() + " from checkpoint at (" + checkpoint.x() + ", " + checkpoint.y() + ") on map");
+                return true;
             } else {
                 renderingService.warn("No checkpoint to resume!");
+                return false;
             }
         } catch (FileManagementException e) {
             throw new RPGException(e.getMessage());

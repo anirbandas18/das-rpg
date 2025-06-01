@@ -85,8 +85,9 @@ public class DefaultMenuServiceEngineImpl implements MenuService {
                     case "S" -> rpgapi.saveGame();
                     case "D" -> rpgapi.deleteGame();
                     case "R" -> {
-                        rpgapi.resumeGame();
-                        rpgapi.explore();
+                        if(rpgapi.resumeGame()) {
+                            rpgapi.explore();
+                        }
                     }
                     case "X" -> rpgapi.exitGame();
                     default -> renderingService.error("Option " + option + " not supported. Try again!");
