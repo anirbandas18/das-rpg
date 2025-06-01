@@ -15,6 +15,8 @@ import com.teenthofabud.game.resources.character.CharacterException;
 import com.teenthofabud.game.resources.character.service.CharacterService;
 import com.teenthofabud.game.persistence.checkpoint.Checkpoint;
 import com.teenthofabud.game.resources.map.Map;
+import com.teenthofabud.game.resources.map.MapException;
+import com.teenthofabud.game.resources.map.service.MapService;
 import com.teenthofabud.game.resources.player.Player;
 import com.teenthofabud.game.resources.player.PlayerException;
 import com.teenthofabud.game.resources.player.service.PlayerService;
@@ -23,7 +25,6 @@ import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Optional;
 
 public class DefaultRPGServiceImpl implements RPGAPI {
 
@@ -47,6 +48,11 @@ public class DefaultRPGServiceImpl implements RPGAPI {
     private FileManager<Checkpoint, Path> checkpointFileManager;
     private RenderingService renderingService;
     private ExplorationService explorationService;
+    private MapService mapService;
+
+    private Map map;
+    private Character character;
+    private Point currentPosition;
 
     private DefaultRPGServiceImpl(BufferedReader stdin,
                                   PlayerService playerService,
@@ -54,7 +60,8 @@ public class DefaultRPGServiceImpl implements RPGAPI {
                                   CharacterService characterService,
                                   FileManager<Checkpoint, Path> checkpointFileManager,
                                   RenderingService renderingService,
-                                  ExplorationService explorationService) {
+                                  ExplorationService explorationService,
+                                  MapService mapService) {
         this.stdin = stdin;
         this.playerService = playerService;
         this.characterTypeService = characterTypeService;
@@ -62,62 +69,69 @@ public class DefaultRPGServiceImpl implements RPGAPI {
         this.checkpointFileManager = checkpointFileManager;
         this.renderingService = renderingService;
         this.explorationService = explorationService;
+        this.mapService = mapService;
     }
 
     @Override
-    public Character createCharacter() throws RPGException {
-        Character character = null;
+    public void createCharacter() throws RPGException {
         try {
             renderingService.info("Enter player name: ");
             Player player = playerService.createPlayer(stdin.readLine());
             CharacterType type = characterTypeService.retrieveCharacterType(Math.abs(player.hashCode()));
             character = characterService.createCharacter(player, type);
+            currentPosition.x = 0;
+            currentPosition.y = 0;
             renderingService.success("Created character: " + character);
         } catch (PlayerException | CharacterException | CharacterTypeException e) {
             renderingService.error(e.getMessage());
         } catch (IOException e) {
             throw new RPGException(e.getMessage());
         }
-        return character;
     }
 
     @Override
-    public void saveGame(Checkpoint checkpoint) {
-        if(checkpoint != null) {
-            if(checkpoint.getCharacter() == null) {
-                renderingService.warn("No progress available to save!");
-                return;
-            }
-            renderingService.info("Saving checkpoint....");
-            try {
-                checkpointFileManager.writeData(checkpoint);
-            } catch (FileManagementException e) {
-                renderingService.error(e.getMessage());
-            }
-            renderingService.success("Checkpoint saved for " + checkpoint.getCharacter() + " at (" + checkpoint.x() + ", " + checkpoint.y() + ") on map");
-        } else {
-            renderingService.info("No checkpoint to save!");
+    public void saveGame() throws RPGException {
+        if(character == null) {
+            renderingService.warn("No character available to save!");
+            return;
         }
+        if(currentPosition == null) {
+            renderingService.warn("No position available to save!");
+            return;
+        }
+        if(currentPosition.x < 0 || currentPosition.y < 0) {
+            throw new RPGException("invalid position");
+        }
+        renderingService.info("Saving checkpoint....");
+        try {
+            Checkpoint checkpoint = new Checkpoint.Builder().x(currentPosition.x).y(currentPosition.y).character(character).build();
+            checkpointFileManager.writeData(checkpoint);
+        } catch (FileManagementException e) {
+            renderingService.error(e.getMessage());
+        }
+        renderingService.success("Checkpoint saved for " + character + " at (" + currentPosition.x + ", " + currentPosition.y + ") on map " + map.getName());
     }
 
     @Override
-    public Optional<Checkpoint> resumeGame() throws RPGException {
-        Optional<Checkpoint> optionalCheckpoint = Optional.empty();
+    public void resumeGame() throws RPGException {
         try {
             if(checkpointFileManager.isDataAvailable()) {
                 renderingService.info("Resuming checkpoint....");
                 Checkpoint checkpoint = checkpointFileManager.readData();
+                character = checkpoint.getCharacter();
+                currentPosition.x = checkpoint.x();
+                currentPosition.y = checkpoint.y();
                 renderingService.success("Resumed " + checkpoint.getCharacter() + " from checkpoint at (" + checkpoint.x() + ", " + checkpoint.y() + ") on map");
-                optionalCheckpoint = Optional.of(checkpoint);
+            } else {
+                renderingService.warn("No checkpoint to resume!");
             }
         } catch (FileManagementException e) {
             throw new RPGException(e.getMessage());
         }
-        return optionalCheckpoint;
     }
 
     @Override
-    public boolean deleteGame()  throws RPGException {
+    public void deleteGame() throws RPGException {
         boolean flag = true;
         try {
             if(checkpointFileManager.isDataAvailable()) {
@@ -134,14 +148,12 @@ public class DefaultRPGServiceImpl implements RPGAPI {
                         default -> renderingService.error("Option " + option + " not supported. Try again!");
                     }
                 }
-                return true;
+            } else {
+                renderingService.warn("No checkpoint to delete!");
             }
-        } catch (IOException e) {
+        } catch (IOException | FileManagementException e) {
             throw new RPGException(e.getMessage());
-        } catch (FileManagementException e) {
-            renderingService.error(e.getMessage());
         }
-        return false;
     }
 
     @Override
@@ -151,25 +163,27 @@ public class DefaultRPGServiceImpl implements RPGAPI {
     }
 
     @Override
-    public void explore(Map map, Checkpoint checkpoint) throws RPGException {
+    public void explore() throws RPGException {
+        if(map == null) {
+            throw new RPGException("Map not available");
+        }
         boolean flag = true;
         try {
-            Point newPosition = new Point(checkpoint.x(), checkpoint.y());
+            explorationService.init(character, currentPosition, map);
             while(flag) {
                 renderingService.menu(EXPLORE_MENU);
-                renderingService.grid(map.getMagnitude(), newPosition.x, newPosition.y);
+                renderingService.grid(map.getMagnitude(), currentPosition.x, currentPosition.y);
                 String option = stdin.readLine();
                 switch (option.toUpperCase()) {
                     case "U", "D", "L", "R" -> {
-                        newPosition = explorationService.move(map, option.toUpperCase(), checkpoint);
-                        checkpoint.x(newPosition.x);
-                        checkpoint.y(newPosition.y);
+                        explorationService.move(option.toUpperCase());
+                        currentPosition = explorationService.checkpoint();
                     }
                     case "S" -> {
-                        saveGame(checkpoint);
-                        flag = false;
+                        saveGame();
                     }
                     case "X" -> {
+                        explorationService.clear();
                         renderingService.info("Back to game menu....");
                         flag = false;
                     }
@@ -183,6 +197,22 @@ public class DefaultRPGServiceImpl implements RPGAPI {
         }
     }
 
+    @Override
+    public void init() throws RPGException {
+        try {
+            this.map = mapService.getDefaultGrid();
+            this.currentPosition = new Point(0, 0);
+        } catch (MapException e) {
+            throw new RPGException(e.getMessage());
+        }
+    }
+
+    @Override
+    public void clear() {
+        this.character = null;
+        this.currentPosition = null;
+    }
+
     private static volatile RPGAPI INSTANCE;
 
     public static RPGAPI getInstance(BufferedReader stdin,
@@ -191,14 +221,15 @@ public class DefaultRPGServiceImpl implements RPGAPI {
                                      CharacterService characterService,
                                      FileManager<Checkpoint, Path> checkpointFileManager,
                                      RenderingService renderingService,
-                                     ExplorationService explorationService) {
+                                     ExplorationService explorationService,
+                                     MapService mapService) {
         RPGAPI result = INSTANCE;
         if (result != null) {
             return result;
         }
         synchronized(DefaultRPGServiceImpl.class) {
             if (INSTANCE == null) {
-                INSTANCE = new DefaultRPGServiceImpl(stdin, playerService, characterTypeService, characterService, checkpointFileManager, renderingService, explorationService);
+                INSTANCE = new DefaultRPGServiceImpl(stdin, playerService, characterTypeService, characterService, checkpointFileManager, renderingService, explorationService, mapService);
             }
             return INSTANCE;
         }

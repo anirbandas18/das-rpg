@@ -6,151 +6,156 @@ import com.teenthofabud.game.constants.movement.service.MovementService;
 import com.teenthofabud.game.engine.exploration.ExplorationException;
 import com.teenthofabud.game.engine.exploration.ExplorationService;
 import com.teenthofabud.game.engine.renderer.RenderingService;
-import com.teenthofabud.game.persistence.checkpoint.Checkpoint;
+import com.teenthofabud.game.resources.character.Character;
 import com.teenthofabud.game.resources.map.Map;
 
 import java.awt.*;
-
 
 public class DefaultExplorationServiceImpl implements ExplorationService {
 
     private RenderingService renderingService;
     private MovementService movementService;
+    private Character character;
+    private Point point;
+    private Map map;
 
-    private void render(String characterName, String movementName, String mapName) {
-        renderingService.error(characterName + " can't explore " + movementName + " on map " + mapName);
+    private void render(String movementName) {
+        renderingService.error(character + " can't explore " + movementName + " on map " + map.getName());
     }
 
-    private boolean possibleToMoveUpOrLeftFromTopLeftCorner(Movement movement, Checkpoint checkpoint, Map map) {
+    private boolean possibleToMoveUpOrLeftFromTopLeftCorner(Movement movement) {
         boolean flag = true;
-        if(checkpoint.x() == 0 && checkpoint.y() == 0) {
+        if(point.x == 0 && point.y == 0) {
             if(movement.compareTo(Movement.UP) == 0) {
                 flag = false;
-                render(checkpoint.getCharacter().getPlayer().getName(), movement.name(), map.getName());
+                render(movement.name());
             }
             if(movement.compareTo(Movement.LEFT) == 0) {
                 flag = false;
-                render(checkpoint.getCharacter().getPlayer().getName(), movement.name(), map.getName());
+                render(movement.name());
             }
         }
         return flag;
     }
 
-    private boolean possibleToMoveUpOrRightFromTopRightCorner(Movement movement, Checkpoint checkpoint, Map map) {
+    private boolean possibleToMoveUpOrRightFromTopRightCorner(Movement movement) {
         boolean flag = true;
-        if(checkpoint.x() == 0 && checkpoint.y() == map.getMagnitude() - 1) {
+        if(point.x == 0 && point.y == map.getMagnitude() - 1) {
             if(movement.compareTo(Movement.UP) == 0) {
                 flag = false;
-                render(checkpoint.getCharacter().getPlayer().getName(), movement.name(), map.getName());
+                render(movement.name());
             }
             if(movement.compareTo(Movement.RIGHT) == 0) {
                 flag = false;
-                render(checkpoint.getCharacter().getPlayer().getName(), movement.name(), map.getName());
+                render(movement.name());
             }
         }
         return flag;
     }
 
-    private boolean possibleToMoveDownOrLeftFromBottomRightCorner(Movement movement, Checkpoint checkpoint, Map map) {
+    private boolean possibleToMoveDownOrLeftFromBottomRightCorner(Movement movement) {
         boolean flag = true;
-        if(checkpoint.x() == map.getMagnitude() - 1 && checkpoint.y() == 0) {
+        if(point.x == map.getMagnitude() - 1 && point.y == 0) {
             if(movement.compareTo(Movement.DOWN) == 0) {
                 flag = false;
-                render(checkpoint.getCharacter().getPlayer().getName(), movement.name(), map.getName());
+                render(movement.name());
             }
             if(movement.compareTo(Movement.LEFT) == 0) {
                 flag = false;
-                render(checkpoint.getCharacter().getPlayer().getName(), movement.name(), map.getName());
+                render(movement.name());
             }
         }
         return flag;
     }
 
-    private boolean possibleToMoveDownOrRightFromBottomRightCorner(Movement movement, Checkpoint checkpoint, Map map) {
+    private boolean possibleToMoveDownOrRightFromBottomRightCorner(Movement movement) {
         boolean flag = true;
-        if(checkpoint.x() == map.getMagnitude() - 1 && checkpoint.y() == map.getMagnitude() - 1) {
+        if(point.x == map.getMagnitude() - 1 && point.y == map.getMagnitude() - 1) {
             if(movement.compareTo(Movement.DOWN) == 0) {
                 flag = false;
-                render(checkpoint.getCharacter().getPlayer().getName(), movement.name(), map.getName());
+                render(movement.name());
             }
             if(movement.compareTo(Movement.RIGHT) == 0) {
                 flag = false;
-                render(checkpoint.getCharacter().getPlayer().getName(), movement.name(), map.getName());
+                render(movement.name());
             }
         }
         return flag;
     }
 
-    private boolean isCrossingBoundaryHorizontallyOrVertically(Movement movement, Checkpoint checkpoint, Map map) {
+    private boolean isCrossingBoundaryHorizontallyOrVertically(Movement movement) {
         boolean flag = false;
-        if(checkpoint.x() == 0 && checkpoint.y() > 0 && checkpoint.y() < map.getMagnitude() - 1 && movement.compareTo(Movement.UP) == 0) {
+        if(point.x == 0 && point.y > 0 && point.y < map.getMagnitude() - 1 && movement.compareTo(Movement.UP) == 0) {
             flag = true;
-            render(checkpoint.getCharacter().getPlayer().getName(), movement.name(), map.getName());
+            render(movement.name());
         }
-        if(checkpoint.x() == map.getMagnitude() - 1 && checkpoint.y() > 0 && checkpoint.y() < map.getMagnitude() - 1 && movement.compareTo(Movement.DOWN) == 0) {
+        if(point.x == map.getMagnitude() - 1 && point.y > 0 && point.y < map.getMagnitude() - 1 && movement.compareTo(Movement.DOWN) == 0) {
             flag = true;
-            render(checkpoint.getCharacter().getPlayer().getName(), movement.name(), map.getName());
+            render(movement.name());
         }
-        if(checkpoint.y() == 0 && checkpoint.x() > 0 && checkpoint.x() < map.getMagnitude() - 1 && movement.compareTo(Movement.LEFT) == 0) {
+        if(point.y == 0 && point.x > 0 && point.x < map.getMagnitude() - 1 && movement.compareTo(Movement.LEFT) == 0) {
             flag = true;
-            render(checkpoint.getCharacter().getPlayer().getName(), movement.name(), map.getName());
+            render(movement.name());
         }
-        if(checkpoint.y() == map.getMagnitude() - 1 && checkpoint.x() > 0 && checkpoint.x() < map.getMagnitude() - 1 && movement.compareTo(Movement.RIGHT) == 0) {
+        if(point.y == map.getMagnitude() - 1 && point.x > 0 && point.x < map.getMagnitude() - 1 && movement.compareTo(Movement.RIGHT) == 0) {
             flag = true;
-            render(checkpoint.getCharacter().getPlayer().getName(), movement.name(), map.getName());
+            render(movement.name());
         }
         return flag;
     }
 
     @Override
-    public Point move(Map map, String movementKey, Checkpoint checkpoint) throws ExplorationException {
-        Point newPosition = new Point(0, 0);
+    public void init(Character character, Point point, Map map) throws ExplorationException {
         if(map == null) {
             throw new ExplorationException("map is required");
         }
-        if(checkpoint == null) {
-            throw new ExplorationException("checkpoint is required");
+        if(point == null) {
+            throw new ExplorationException("point is required");
         }
-        if(checkpoint.x() < 0 || checkpoint.y() < 0) {
+        if(point.x < 0 || point.y < 0) {
             throw new ExplorationException("from last position is invalid");
         }
-        if(checkpoint.getCharacter() == null) {
+        if(character == null) {
             throw new ExplorationException("is missing character");
         }
+        this.map = map;
+        this.character = character;
+        this.point = point;
+        renderingService.info(character + " loaded on map " + map.getName() + " at (" + point.x + "," + point.y + ")");
+    }
+
+    @Override
+    public void move(String movementKey) throws ExplorationException {
         try {
             Movement movement = movementService.retrieveMovement(movementKey);
-            boolean possibleToMoveUpOrLeftFromTopLeftCorner = possibleToMoveUpOrLeftFromTopLeftCorner(movement, checkpoint, map);
-            boolean possibleToMoveUpOrRightFromTopRightCorner = possibleToMoveUpOrRightFromTopRightCorner(movement, checkpoint, map);
-            boolean possibleToMoveDownOrLeftFromBottomRightCorner = possibleToMoveDownOrLeftFromBottomRightCorner(movement, checkpoint, map);
-            boolean possibleToMoveDownOrRightFromBottomRightCorner = possibleToMoveDownOrRightFromBottomRightCorner(movement, checkpoint, map);
-            boolean isCrossingBoundaryHorizontallyOrVertically = isCrossingBoundaryHorizontallyOrVertically(movement, checkpoint, map);
+            boolean possibleToMoveUpOrLeftFromTopLeftCorner = possibleToMoveUpOrLeftFromTopLeftCorner(movement);
+            boolean possibleToMoveUpOrRightFromTopRightCorner = possibleToMoveUpOrRightFromTopRightCorner(movement);
+            boolean possibleToMoveDownOrLeftFromBottomRightCorner = possibleToMoveDownOrLeftFromBottomRightCorner(movement);
+            boolean possibleToMoveDownOrRightFromBottomRightCorner = possibleToMoveDownOrRightFromBottomRightCorner(movement);;
+            boolean isCrossingBoundaryHorizontallyOrVertically = isCrossingBoundaryHorizontallyOrVertically(movement);
             if(possibleToMoveUpOrLeftFromTopLeftCorner & possibleToMoveUpOrRightFromTopRightCorner & possibleToMoveDownOrLeftFromBottomRightCorner & possibleToMoveDownOrRightFromBottomRightCorner & !isCrossingBoundaryHorizontallyOrVertically) {
                 switch (movement) {
-                    case UP -> {
-                        newPosition.x = checkpoint.x() - 1;
-                        newPosition.y = checkpoint.y();
-                    }
-                    case DOWN -> {
-                        newPosition.x = checkpoint.x() + 1;
-                        newPosition.y = checkpoint.y();
-                    }
-                    case LEFT -> {
-                        newPosition.y = checkpoint.y() - 1;
-                        newPosition.x = checkpoint.x();
-                    }
-                    case RIGHT -> {
-                        newPosition.y = checkpoint.y() + 1;
-                        newPosition.x = checkpoint.x();
-                    }
+                    case UP -> point.x = point.x - 1;
+                    case DOWN -> point.x = point.x + 1;
+                    case LEFT -> point.y = point.y - 1;
+                    case RIGHT -> point.y = point.y + 1;
                 }
-            } else {
-                newPosition.y = checkpoint.y();
-                newPosition.x = checkpoint.x();
             }
         } catch (MovementException e) {
-            renderingService.error(e.getMessage());
+            throw new ExplorationException(e.getMessage());
         }
-        return newPosition;
+    }
+
+    @Override
+    public Point checkpoint() {
+        return point;
+    }
+
+    @Override
+    public void clear() {
+        this.character = null;
+        this.point = null;
+        this.map = null;
     }
 
     private static volatile ExplorationService INSTANCE;

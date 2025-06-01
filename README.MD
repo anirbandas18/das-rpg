@@ -49,7 +49,7 @@ will be crucial once fights to gai experience are introduced.
 * Feature workflows using mvc
 * Business logic creation using singleton
 * Component are composed with dependency injection
-* ~~Game session is managed using state pattern~~
+* State machine for game and exploration management
 
 ## Extensibility of the project
 * Create new character types by adding new values in the CharacterType enum
