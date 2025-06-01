@@ -2,7 +2,7 @@
 
 ## How to interact with the game?
 
-The in game menu is presented to the player with the following options on the console at startup when the game is run.
+The in gameplay menu is presented to the player with the following options on the console at startup when the game is run.
 
 ```
             ▐▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▌
@@ -17,17 +17,24 @@ The in game menu is presented to the player with the following options on the co
             ▐▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▌
 ```
 
-* Enter option C to create a new character. You will be asked to enter the player name and the game will assign you a random character type
-* Enter option S to save the game at the current state of the character
-* Enter option R to resume the game from the last saved state of the character
+* Enter option C to create a new character for exploration. You will be asked to enter the player name and the game will assign you a random character type
+* Enter option E to start exploring with a character. You can either create a new character and start exploring or resume a saved game to continue exploration
+* Enter option S to save the game at the current state of the character's exploration
+* Enter option D to delete any saved game
+* Enter option R to resume a saved game from the last position that the character explored
 * Enter option X to exit the game
 
 ## What to expect from the game?
 
-* Progress is measured by creating a character to explore and fighting enemies to gain experience
+* You can create a character and explore but if you resume a game after creating a new character, any previously saved character and its progress will overwrite your unsaved progress with new character 
+* Explicitly save a character and its progress otherwise progress will be lost
+* There is only one default map to play the game
+* Saving a game will override a previously saved game without warning
+* Deleting a game will ask you to confirm your decision before actually deleting
+* Resuming a game will overwrite any unsaved character and its progress
 * Creating a new character resets previous progress with any other character
 * Game should be explicitly saved otherwise progress will be lost
-* Player can only explore with a new character or a saved character
+* Player can only explore with a new or saved character
 
 ## How to explore with a character?
 

@@ -12,7 +12,7 @@
 
 ### v1.1
 * Decorated with ASCII art and ANSI colors
-* Save and resume checkpoint
+* Save and resume game
 * File management
 * Test data source
 * Code coverage support
@@ -24,4 +24,4 @@
 * Input controller for movement
 * Render exploration
 * Configuration management
-* More game options like delete game or explore
+* More game options like delete game
