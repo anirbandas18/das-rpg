@@ -25,3 +25,13 @@
 * Render exploration
 * Configuration management
 * More game options like delete game
+
+---
+
+### v2.1
+* Updated documentation
+* Refactored game engine into driver
+* Implemented state machine for game engine
+* Validate rendering of menu and map
+* Check file existence in file manager
+* Added unit tests for game engine
