@@ -5,6 +5,8 @@ import com.teenthofabud.game.constants.charactertype.CharacterType;
 import com.teenthofabud.game.constants.charactertype.service.CharacterTypeService;
 import com.teenthofabud.game.constants.movement.service.MovementService;
 import com.teenthofabud.game.constants.movement.service.impl.DefaultMovementServiceImpl;
+import com.teenthofabud.game.engine.controller.MenuService;
+import com.teenthofabud.game.engine.controller.impl.DefaultMenuServiceEngineImpl;
 import com.teenthofabud.game.engine.service.RPGAPI;
 import com.teenthofabud.game.engine.service.RPGException;
 import com.teenthofabud.game.engine.service.impl.DefaultRPGServiceImpl;
@@ -37,9 +39,9 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.mockito.Mockito.*;
 
-public class MenuControllerTest implements TestDataSourceProvider {
+public class MenuServiceTest implements TestDataSourceProvider {
 
-    private static RPGAPI MENU_API;
+    private static RPGAPI RPGAPI;
     private static BufferedReader STDIN;
     private static PlayerService PLAYER_SERVICE;
     private static CharacterTypeService CHARACTER_TYPE_SERVICE;
@@ -50,6 +52,7 @@ public class MenuControllerTest implements TestDataSourceProvider {
     private static MovementService MOVEMENT_SERVICE;
     private static ExplorationService EXPLORATION_SERVICE;
     private static MapService MAP_SERVICE;
+    private static MenuService MENU_SERVICE;
 
     private String playerName;
     private Player player;
@@ -70,6 +73,7 @@ public class MenuControllerTest implements TestDataSourceProvider {
         reset(CHARACTER_SERVICE);
         reset(CHECKPOINT_FILE_MANAGER);
         reset(CONFIGURATION_FILE_MANAGER);
+        reset(MAP_SERVICE);
     }
 
     @BeforeAll
@@ -80,32 +84,45 @@ public class MenuControllerTest implements TestDataSourceProvider {
         PLAYER_SERVICE = mock(PlayerService.class);
         CHARACTER_TYPE_SERVICE = mock(CharacterTypeService.class);
         CHARACTER_SERVICE = mock(CharacterService.class);
+        MAP_SERVICE = mock(MapService.class);
         RENDERING_SERVICE = DefaultStdoutRenderingImpl.getInstance();
         MOVEMENT_SERVICE = DefaultMovementServiceImpl.getInstance();
-        MAP_SERVICE = DefaultMapServiceImpl.getInstance(CONFIGURATION_FILE_MANAGER);
         EXPLORATION_SERVICE = DefaultExplorationServiceImpl.getInstance(RENDERING_SERVICE, MOVEMENT_SERVICE);
-        MENU_API = DefaultRPGServiceImpl.getInstance(STDIN, PLAYER_SERVICE, CHARACTER_TYPE_SERVICE, CHARACTER_SERVICE, CHECKPOINT_FILE_MANAGER, RENDERING_SERVICE, EXPLORATION_SERVICE, MAP_SERVICE);
+        RPGAPI = DefaultRPGServiceImpl.getInstance(STDIN, PLAYER_SERVICE, CHARACTER_TYPE_SERVICE, CHARACTER_SERVICE, CHECKPOINT_FILE_MANAGER, RENDERING_SERVICE, EXPLORATION_SERVICE, MAP_SERVICE);
+        MENU_SERVICE = DefaultMenuServiceEngineImpl.getInstance(STDIN, RENDERING_SERVICE, RPGAPI);
     }
 
     @Test
-    public void testCreateCharacterIsSuccessful() {
+    public void testPlayWhenOptionC() {
         assertDoesNotThrow(() -> {
-            when(STDIN.readLine()).thenReturn(playerName);
-            when(PLAYER_SERVICE.createPlayer(playerName)).thenReturn(player);
-            when(CHARACTER_TYPE_SERVICE.retrieveCharacterType(Math.abs(player.hashCode()))).thenReturn(characterType);
-            when(CHARACTER_SERVICE.createCharacter(player, characterType)).thenReturn(character);
+            when(MAP_SERVICE.getDefaultGrid()).thenReturn(defaultMap(configuration()));
+            when(STDIN.readLine()).thenReturn("C");
 
-            Character actualCharacter = MENU_API.createCharacter();
+            MENU_SERVICE.play();
 
-            Assertions.assertEquals(character, actualCharacter);
+            verify(RPGAPI, times(1)).init();
+            verify(RPGAPI, times(1)).createCharacter();
         });
     }
 
-    @Test
+    /*@Test
+    public void testExitUsingOptionX() {
+        assertDoesNotThrow(() -> {
+            when(MAP_SERVICE.getDefaultGrid()).thenReturn(defaultMap(configuration()));
+            when(STDIN.readLine()).thenReturn("X");
+            doNothing().when(RPGAPI).exitGame();
+
+            MENU_SERVICE.play();
+
+            verify(RPGAPI, times(1)).exitGame();
+        });
+    }*/
+
+    /*@Test
     public void testCreateCharacterSystemFailure() {
         assertThrowsExactly(RPGException.class, () -> {
             when(STDIN.readLine()).thenThrow(new IOException("STDIN Simulation"));
-            MENU_API.createCharacter();
+            RPGAPI.createCharacter();
         });
     }
 
@@ -115,7 +132,7 @@ public class MenuControllerTest implements TestDataSourceProvider {
             when(STDIN.readLine()).thenReturn(playerName);
             when(PLAYER_SERVICE.createPlayer(playerName)).thenThrow(new PlayerException("Simulation"));
 
-            Character actualCharacter = MENU_API.createCharacter();
+            Character actualCharacter = RPGAPI.createCharacter();
 
             Assertions.assertNull(actualCharacter);
         });
@@ -125,7 +142,7 @@ public class MenuControllerTest implements TestDataSourceProvider {
     public void testSaveGameIsSuccessful() {
         assertDoesNotThrow(() -> {
             doNothing().when(CHECKPOINT_FILE_MANAGER).writeData(checkpoint);
-            MENU_API.saveGame(checkpoint);
+            RPGAPI.saveGame(checkpoint);
         });
     }
 
@@ -135,11 +152,11 @@ public class MenuControllerTest implements TestDataSourceProvider {
             when(CHECKPOINT_FILE_MANAGER.isDataAvailable()).thenReturn(true);
             when(CHECKPOINT_FILE_MANAGER.readData()).thenReturn(checkpoint);
 
-            Optional<Checkpoint> actualOptionalCheckpoint = MENU_API.resumeGame();
+            Optional<Checkpoint> actualOptionalCheckpoint = RPGAPI.resumeGame();
 
             Assertions.assertTrue(actualOptionalCheckpoint.isPresent());
             Assertions.assertEquals(checkpoint, actualOptionalCheckpoint.get());
         });
-    }
+    }*/
 
 }

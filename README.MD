@@ -3,16 +3,21 @@
 ## System requirements
 * JDK 21
 * Maven 3.9.x
-* Permission for the game to write in the current working directory as the game binary
+* Permission for the game to write in the current working directory that hosts the game binary
 
 ## Build
 ```
 mvn clean package -e
 ```
 
-## Coverage
+## Test
 ```
 mvn test -e
+```
+
+## Coverage
+```
+mvn jacoco:report -e
 ```
 
 ## Run
@@ -49,7 +54,7 @@ will be crucial once fights to gai experience are introduced.
 * Feature workflows using mvc
 * Business logic creation using singleton
 * Component are composed with dependency injection
-* State machine for game and exploration management
+* State machine to manage game and exploration behaviour
 
 ## Extensibility of the project
 * Create new character types by adding new values in the CharacterType enum

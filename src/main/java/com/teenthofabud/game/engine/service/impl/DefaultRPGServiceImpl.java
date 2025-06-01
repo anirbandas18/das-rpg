@@ -175,7 +175,7 @@ public class DefaultRPGServiceImpl implements RPGAPI {
             explorationService.init(character, currentPosition, map);
             while(flag) {
                 renderingService.menu(EXPLORE_MENU);
-                renderingService.grid(map.getMagnitude(), currentPosition.x, currentPosition.y);
+                renderingService.map(map.getMagnitude(), currentPosition.x, currentPosition.y);
                 String option = stdin.readLine();
                 switch (option.toUpperCase()) {
                     case "U", "D", "L", "R" -> {

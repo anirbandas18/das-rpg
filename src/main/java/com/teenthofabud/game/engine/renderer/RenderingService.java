@@ -4,7 +4,7 @@ public interface RenderingService {
 
     public void menu(String options) throws RenderingException;
 
-    public void grid(int magnitude, int x, int y) throws RenderingException;
+    public void map(int magnitude, int x, int y) throws RenderingException;
 
     public void info(String message);
 

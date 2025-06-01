@@ -112,20 +112,21 @@ public class DefaultExplorationServiceImpl implements ExplorationService {
         if(point == null) {
             throw new ExplorationException("point is required");
         }
-        if(point.x < 0 || point.y < 0) {
-            throw new ExplorationException("from last position is invalid");
+        if(point.x < 0 || point.y < 0 || point.x >= map.getMagnitude() || point.y >= map.getMagnitude()) {
+            throw new ExplorationException("from position is invalid");
         }
         if(character == null) {
             throw new ExplorationException("is missing character");
         }
         this.map = map;
         this.character = character;
-        this.point = point;
+        this.point = new Point(point.x, point.y);
         renderingService.info(character + " loaded on map " + map.getName() + " at (" + point.x + "," + point.y + ")");
     }
 
     @Override
-    public void move(String movementKey) throws ExplorationException {
+    public boolean move(String movementKey) throws ExplorationException {
+        boolean success = false;
         try {
             Movement movement = movementService.retrieveMovement(movementKey);
             boolean possibleToMoveUpOrLeftFromTopLeftCorner = possibleToMoveUpOrLeftFromTopLeftCorner(movement);
@@ -133,7 +134,8 @@ public class DefaultExplorationServiceImpl implements ExplorationService {
             boolean possibleToMoveDownOrLeftFromBottomRightCorner = possibleToMoveDownOrLeftFromBottomRightCorner(movement);
             boolean possibleToMoveDownOrRightFromBottomRightCorner = possibleToMoveDownOrRightFromBottomRightCorner(movement);;
             boolean isCrossingBoundaryHorizontallyOrVertically = isCrossingBoundaryHorizontallyOrVertically(movement);
-            if(possibleToMoveUpOrLeftFromTopLeftCorner & possibleToMoveUpOrRightFromTopRightCorner & possibleToMoveDownOrLeftFromBottomRightCorner & possibleToMoveDownOrRightFromBottomRightCorner & !isCrossingBoundaryHorizontallyOrVertically) {
+            success = possibleToMoveUpOrLeftFromTopLeftCorner & possibleToMoveUpOrRightFromTopRightCorner & possibleToMoveDownOrLeftFromBottomRightCorner & possibleToMoveDownOrRightFromBottomRightCorner & !isCrossingBoundaryHorizontallyOrVertically;
+            if(success) {
                 switch (movement) {
                     case UP -> point.x = point.x - 1;
                     case DOWN -> point.x = point.x + 1;
@@ -141,9 +143,11 @@ public class DefaultExplorationServiceImpl implements ExplorationService {
                     case RIGHT -> point.y = point.y + 1;
                 }
             }
+
         } catch (MovementException e) {
             throw new ExplorationException(e.getMessage());
         }
+        return success;
     }
 
     @Override
@@ -154,7 +158,7 @@ public class DefaultExplorationServiceImpl implements ExplorationService {
     @Override
     public void clear() {
         this.character = null;
-        this.point = null;
+        this.point = new Point(0, 0);
         this.map = null;
     }
 

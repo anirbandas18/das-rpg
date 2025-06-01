@@ -21,7 +21,7 @@ public class DefaultStdoutRenderingImpl implements RenderingService {
     }
 
     @Override
-    public void grid(int magnitude, int x, int y) throws RenderingException {
+    public void map(int magnitude, int x, int y) throws RenderingException {
         if(x > magnitude || y > magnitude || x < 0 || y < 0) {
             throw new RenderingException("incompatible position coordinates vs map magnitude");
         }
