@@ -16,3 +16,12 @@
 * File management
 * Test data source
 * Code coverage support
+
+---
+
+### v2.0
+* Explore map
+* Input controller for movement
+* Render exploration
+* Configuration management
+* More game options like delete game or explore

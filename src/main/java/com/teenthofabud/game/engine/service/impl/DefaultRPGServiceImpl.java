@@ -27,15 +27,16 @@ import java.util.Optional;
 public class DefaultRPGServiceImpl implements RPGAPI {
 
     private static final String MOVEMENT_MENU = """
-            ▐▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▌
-            ▐   Movement Menu   ▌
-            ▐===================▌
-            ▐  U - Move up      ▌
-            ▐  D - Move down    ▌
-            ▐  L - Move left    ▌
-            ▐  R - Move right   ▌
-            ▐  X - Main menu    ▌
-            ▐▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▌
+            ▐▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▌
+            ▐    Movement Menu    ▌
+            ▐=====================▌
+            ▐  U - Move up        ▌
+            ▐  D - Move down      ▌
+            ▐  L - Move left      ▌
+            ▐  R - Move right     ▌
+            ▐  S - Save position  ▌
+            ▐  X - Game menu      ▌
+            ▐▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▌
             """;
 
     private BufferedReader stdin;

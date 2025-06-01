@@ -1,4 +1,4 @@
-# Das Fussball §RPG
+# Das Fussball RPG
 
 ## System requirements
 * JDK 21
