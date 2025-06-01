@@ -27,6 +27,7 @@ The in game menu is presented to the player with the following options on the co
 * Progress is measured by creating a character to explore and fighting enemies to gain experience
 * Creating a new character resets previous progress with any other character
 * Game should be explicitly saved otherwise progress will be lost
+* Player can only explore with a new character or a saved character
 
 ## How to explore with a character?
 
