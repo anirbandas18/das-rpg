@@ -1,5 +1,6 @@
 package com.teenthofabud.game.engine.renderer.impl;
 
+import com.teenthofabud.game.engine.renderer.RenderingException;
 import com.teenthofabud.game.engine.renderer.RenderingService;
 
 public class DefaultStdoutRenderingImpl implements RenderingService {
@@ -12,12 +13,18 @@ public class DefaultStdoutRenderingImpl implements RenderingService {
     private static final String ANSI_RED = "\u001B[31m";
 
     @Override
-    public void menu(String options) {
+    public void menu(String options)  throws RenderingException {
+        if(options == null || options.length() == 0) {
+            throw new RenderingException("no menu provided");
+        }
         System.out.print(ANSI_WHITE + options + ANSI_RESET);
     }
 
     @Override
-    public void grid(int magnitude, int x, int y) {
+    public void grid(int magnitude, int x, int y) throws RenderingException {
+        if(x > magnitude || y > magnitude || x < 0 || y < 0) {
+            throw new RenderingException("incompatible position coordinates vs map magnitude");
+        }
         System.out.print(ANSI_WHITE + "+");
         for(int i = 0 ; i < magnitude * 3 ; i++) {
             System.out.print("-");

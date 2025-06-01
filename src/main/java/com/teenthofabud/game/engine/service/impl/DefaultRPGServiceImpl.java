@@ -3,6 +3,7 @@ package com.teenthofabud.game.engine.service.impl;
 import com.teenthofabud.game.constants.charactertype.CharacterType;
 import com.teenthofabud.game.constants.charactertype.CharacterTypeException;
 import com.teenthofabud.game.constants.charactertype.service.CharacterTypeService;
+import com.teenthofabud.game.engine.renderer.RenderingException;
 import com.teenthofabud.game.engine.service.RPGException;
 import com.teenthofabud.game.engine.service.RPGAPI;
 import com.teenthofabud.game.engine.exploration.ExplorationException;
@@ -192,7 +193,7 @@ public class DefaultRPGServiceImpl implements RPGAPI {
                     default -> renderingService.error("Option " + option + " not supported. Try again!");
                 }
             }
-        } catch (ExplorationException e) {
+        } catch (ExplorationException | RenderingException e) {
             renderingService.error(e.getMessage());
         } catch (IOException e) {
             throw new RPGException(e.getMessage());

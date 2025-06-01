@@ -4,6 +4,7 @@ import com.teenthofabud.game.constants.charactertype.service.CharacterTypeServic
 import com.teenthofabud.game.constants.charactertype.service.impl.DefaultCharacterTypeServiceImpl;
 import com.teenthofabud.game.constants.movement.service.MovementService;
 import com.teenthofabud.game.constants.movement.service.impl.DefaultMovementServiceImpl;
+import com.teenthofabud.game.engine.renderer.RenderingException;
 import com.teenthofabud.game.engine.service.RPGAPI;
 import com.teenthofabud.game.engine.service.RPGException;
 import com.teenthofabud.game.engine.service.impl.DefaultRPGServiceImpl;
@@ -95,7 +96,7 @@ public class DefaultMenuServiceEngineImpl implements MenuService {
             }
         } catch (IOException e) {
             throw new MenuException(e.getMessage());
-        } catch (RPGException e) {
+        } catch (RPGException | RenderingException e) {
             renderingService.error("RPG failure: " + e.getMessage());
         }
     }
