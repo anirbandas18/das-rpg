@@ -17,6 +17,34 @@ public class DefaultStdoutRenderingImpl implements RenderingService {
     }
 
     @Override
+    public void grid(int magnitude, int x, int y) {
+        System.out.print(ANSI_WHITE + "+");
+        for(int i = 0 ; i < magnitude * 3 ; i++) {
+            System.out.print("-");
+        }
+        System.out.print("+" + ANSI_RESET);
+        System.out.println();
+        for(int j = 0 ; j < magnitude ; j++) {
+            System.out.print(ANSI_WHITE + "|");
+            for(int i = 0 ; i < magnitude ; i++) {
+                if(j == x && i == y) {
+                    System.out.print(" O ");
+                } else {
+                    System.out.print(" . ");
+                }
+            }
+            System.out.print("|" + ANSI_RESET);
+            System.out.println();
+        }
+        System.out.print(ANSI_WHITE + "+");
+        for(int i = 0 ; i < magnitude * 3 ; i++) {
+            System.out.print("-");
+        }
+        System.out.print("+" + ANSI_RESET);
+        System.out.println();
+    }
+
+    @Override
     public void info(String message) {
         System.out.println(ANSI_BLUE + message + ANSI_RESET);
     }

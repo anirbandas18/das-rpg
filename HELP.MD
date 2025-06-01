@@ -1,15 +1,17 @@
-The main menu is presented to the player on the console at startup when the game is run.
 
-The main menu has the following options:
+## Interact with the game 
+The in game menu is presented to the player with the following options on the console at startup when the game is run.
+
 ```
-▐▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▌
-▐        Game Menu       ▌
-▐========================▌
-▐  C - Create character  ▌
-▐  S - Save game         ▌
-▐  R - Resume game       ▌
-▐  X - Exit game         ▌
-▐▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▌
+▐▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▌
+▐        Game Menu        ▌
+▐=========================▌
+▐  C - Create character   ▌
+▐  E - Explore            ▌
+▐  S - Save game          ▌
+▐  R - Resume game        ▌
+▐  X - Exit game          ▌
+▐▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▌
 ```
 
 * Enter option C to create a new character. You will be asked to enter the player name and the game will assign you a random character type
@@ -17,5 +19,10 @@ The main menu has the following options:
 * Enter option R to resume the game from the last saved state of the character
 * Enter option X to exit the game
 
-Progress is measured by creating a character, exploring a map or fighting an enemy
+## How the game behaves?
 
+* Progress is measured by creating a character to explore and fighting enemies to gain experience
+* Creating a new character resets previous progress with any other character
+* Exploration is only possible by moving one step at a time in any direction until the edge of the map
+
+## How to explore with a character?

@@ -22,7 +22,7 @@ public interface TestDataSourceProvider {
     }
 
     default Checkpoint checkpoint(Character character) {
-        return new Checkpoint.Builder().character(character).build();
+        return new Checkpoint.Builder().character(character).x(2).y(4).build();
     }
 
 }

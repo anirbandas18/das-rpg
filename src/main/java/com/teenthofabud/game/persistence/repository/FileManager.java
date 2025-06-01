@@ -5,15 +5,16 @@ import com.teenthofabud.game.persistence.FileManagementException;
 import java.io.*;
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
-import java.util.Optional;
 
 public interface FileManager<T> {
 
     static final String DATA_DIRECTORY_NAME = "das-rpg";
 
-    public Optional<T> readData() throws FileManagementException;
+    public T readData() throws FileManagementException;
 
     public void writeData(T data) throws FileManagementException;
+
+    public void clearData() throws FileManagementException;
 
     public String getFileName();
 

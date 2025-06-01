@@ -14,10 +14,9 @@ public class DefaultCheckpointFileManagerImpl implements FileManager<Checkpoint>
     private FileSystem fileSystem;
 
     @Override
-    public Optional<Checkpoint> readData() throws FileManagementException  {
-        Optional<Checkpoint> optionalCheckpoint = Optional.empty();
+    public Checkpoint readData() throws FileManagementException  {
         if(!Files.exists(dataFilePath())) {
-            return optionalCheckpoint;
+            throw new FileManagementException("no save game available");
         }
         if(Files.exists(dataFilePath()) && Files.isDirectory(dataFilePath())) {
             throw new FileManagementException("path " + dataFilePath() + " is a directory");
@@ -25,8 +24,7 @@ public class DefaultCheckpointFileManagerImpl implements FileManager<Checkpoint>
         try {
             byte[] rawBytes = Files.readAllBytes(dataFilePath());
             Checkpoint checkpoint = (Checkpoint) deserialize(rawBytes);
-            optionalCheckpoint = Optional.of(checkpoint);
-            return optionalCheckpoint;
+            return checkpoint;
         } catch (IOException e) {
             throw new FileManagementException(e.getMessage());
         }
@@ -50,6 +48,19 @@ public class DefaultCheckpointFileManagerImpl implements FileManager<Checkpoint>
             throw new FileManagementException(e.getMessage());
         }
 
+    }
+
+    @Override
+    public void clearData() throws FileManagementException {
+        if(!Files.exists(dataFilePath())) {
+            throw new FileManagementException("no save game available");
+        }
+        try {
+            Files.delete(dataFilePath());
+            Files.delete(dataDirectoryPath());
+        } catch (IOException e) {
+            throw new FileManagementException(e.getMessage());
+        }
     }
 
     @Override

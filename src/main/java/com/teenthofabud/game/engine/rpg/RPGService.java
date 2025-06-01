@@ -1,4 +1,4 @@
-package com.teenthofabud.game.engine.service;
+package com.teenthofabud.game.engine.rpg;
 
 public interface RPGService {
 

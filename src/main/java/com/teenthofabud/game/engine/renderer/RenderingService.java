@@ -4,6 +4,8 @@ public interface RenderingService {
 
     public void menu(String options);
 
+    public void grid(int magnitude, int x, int y);
+
     public void info(String message);
 
     public void success(String message);

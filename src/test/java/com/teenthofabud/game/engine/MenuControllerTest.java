@@ -3,9 +3,13 @@ package com.teenthofabud.game.engine;
 import com.teenthofabud.game.TestDataSourceProvider;
 import com.teenthofabud.game.constants.charactertype.CharacterType;
 import com.teenthofabud.game.constants.charactertype.service.CharacterTypeService;
+import com.teenthofabud.game.constants.movement.service.MovementService;
+import com.teenthofabud.game.constants.movement.service.impl.DefaultMovementServiceImpl;
 import com.teenthofabud.game.engine.controller.MenuAPI;
 import com.teenthofabud.game.engine.controller.MenuException;
 import com.teenthofabud.game.engine.controller.impl.DefaultMenuControllerImpl;
+import com.teenthofabud.game.engine.exploration.ExplorationService;
+import com.teenthofabud.game.engine.exploration.impl.DefaultExplorationServiceImpl;
 import com.teenthofabud.game.engine.renderer.RenderingService;
 import com.teenthofabud.game.engine.renderer.impl.DefaultStdoutRenderingImpl;
 import com.teenthofabud.game.persistence.repository.FileManager;
@@ -38,6 +42,8 @@ public class MenuControllerTest implements TestDataSourceProvider {
     private static CharacterService CHARACTER_SERVICE;
     private static FileManager<Checkpoint> FILE_MANAGER_SERVICE;
     private static RenderingService RENDERING_SERVICE;
+    private static MovementService MOVEMENT_SERVICE;
+    private static ExplorationService EXPLORATION_SERVICE;
 
     private String playerName;
     private Player player;
@@ -67,7 +73,9 @@ public class MenuControllerTest implements TestDataSourceProvider {
         CHARACTER_TYPE_SERVICE = mock(CharacterTypeService.class);
         CHARACTER_SERVICE = mock(CharacterService.class);
         RENDERING_SERVICE = DefaultStdoutRenderingImpl.getInstance();
-        MENU_API = DefaultMenuControllerImpl.getInstance(STDIN, PLAYER_SERVICE, CHARACTER_TYPE_SERVICE, CHARACTER_SERVICE, FILE_MANAGER_SERVICE, RENDERING_SERVICE);
+        MOVEMENT_SERVICE = DefaultMovementServiceImpl.getInstance();
+        EXPLORATION_SERVICE = DefaultExplorationServiceImpl.getInstance(RENDERING_SERVICE, MOVEMENT_SERVICE);
+        MENU_API = DefaultMenuControllerImpl.getInstance(STDIN, PLAYER_SERVICE, CHARACTER_TYPE_SERVICE, CHARACTER_SERVICE, FILE_MANAGER_SERVICE, RENDERING_SERVICE, EXPLORATION_SERVICE);
     }
 
     @Test
@@ -115,7 +123,7 @@ public class MenuControllerTest implements TestDataSourceProvider {
     @Test
     public void testResumeGameIsSuccessful() {
         assertDoesNotThrow(() -> {
-            when(FILE_MANAGER_SERVICE.readData()).thenReturn(Optional.of(checkpoint));
+            when(FILE_MANAGER_SERVICE.readData()).thenReturn(checkpoint);
 
             Optional<Checkpoint> actualOptionalCheckpoint = MENU_API.resumeGame();
 

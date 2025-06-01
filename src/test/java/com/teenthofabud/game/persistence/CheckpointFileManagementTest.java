@@ -76,9 +76,8 @@ public class CheckpointFileManagementTest implements TestDataSourceProvider {
 
     @Test
     public void testReadDataWhenNoSaveAvailableIsSuccessful() {
-        assertDoesNotThrow(() -> {
-            Optional<Checkpoint> optionalCheckpoint = CHECKPOINT_FILE_MANAGER.readData();
-            Assertions.assertTrue(optionalCheckpoint.isEmpty());
+        assertThrowsExactly(FileManagementException.class, () -> {
+            Checkpoint checkpoint = CHECKPOINT_FILE_MANAGER.readData();
         });
     }
 
@@ -95,9 +94,9 @@ public class CheckpointFileManagementTest implements TestDataSourceProvider {
         assertDoesNotThrow(() -> {
             Files.createDirectories(CHECKPOINT_FILE_MANAGER.dataDirectoryPath());
             CHECKPOINT_FILE_MANAGER.writeData(checkpoint);
-            Optional<Checkpoint> optionalCheckpoint = CHECKPOINT_FILE_MANAGER.readData();
-            Assertions.assertTrue(optionalCheckpoint.isPresent());
-            Assertions.assertEquals(checkpoint.getCharacter(), optionalCheckpoint.get().getCharacter());
+            Checkpoint checkpoint = CHECKPOINT_FILE_MANAGER.readData();
+            Assertions.assertNotNull(checkpoint);
+            Assertions.assertEquals(checkpoint.getCharacter(), checkpoint.getCharacter());
         });
     }
 

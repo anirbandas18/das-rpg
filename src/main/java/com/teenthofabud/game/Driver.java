@@ -1,8 +1,8 @@
 package com.teenthofabud.game;
 
-import com.teenthofabud.game.engine.service.RPGService;
-import com.teenthofabud.game.engine.service.RPGException;
-import com.teenthofabud.game.engine.service.impl.DefaultRPGServiceEngineImpl;
+import com.teenthofabud.game.engine.rpg.RPGService;
+import com.teenthofabud.game.engine.rpg.RPGException;
+import com.teenthofabud.game.engine.rpg.impl.DefaultRPGServiceEngineImpl;
 
 public class Driver {
 
