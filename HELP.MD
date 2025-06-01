@@ -1,4 +1,4 @@
-# Game Instructions
+# Das Fussball RPG Instructions
 
 ## How to interact with the game?
 
@@ -30,9 +30,8 @@ The in game menu is presented to the player with the following options on the co
 
 ## How to explore with a character?
 
-* Character can explore the default grid
-* The progress of the character's exploration in the grid can be saved and resumed later
-* New character starts from the top left corner of the grid
+* Character can explore only the default map
+* The progress of the character's exploration in the map can be saved and resumed later
 
 ```
             ▐▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▌
@@ -54,10 +53,23 @@ The in game menu is presented to the player with the following options on the co
 * Enter option S to save the current position in the map
 * Enter option X to go back to the game menu
 
+## How does the default map look like?
+
+* The following example is a representation of the default map that comes with this game for a character to explore
+* The default map is called 3xGrid and has a dimension of 3x3
+* The character starts at the top left corner of the map in a new game or from the last position that it explored when the game was saved
+
+```
++---------+
+| 0  .  . |
+| .  .  . |
+| .  .  . |
++---------+
+```
+
 ## How much can you explore with a character?
 
 * Exploration is only possible by moving one step at a time in any direction until the edge of the map
-* A single map of 3x3 grid is currently available by default for exploration
 * You can roam around freely with your character in any direction on the map
 * If you reach the top left corner of the map you can only go down or right from there
 * If you reach the top right corner of the map you can only go down or left from there
