@@ -70,4 +70,4 @@ exploration vs fight experience
 * Map service follows SOLID principles to allow map generations of different types
 * Enemy service follows SOLID principles to allow enemy generations of different types
 * RPG API follows SOLID principles to allow more features like fighting, exploration
-* Default options can be changed or more options added
+* Default configuration options can be changed or more configuration options can be supported easily with configuration model
