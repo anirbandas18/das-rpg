@@ -55,7 +55,7 @@ exploration vs fight experience
 
 ## Technical decision records
 * Architectural components using ddd
-* Feature workflows using mvc
+* Interactive with feature workflows using mvc
 * Business logic creation using singleton
 * Component are composed with dependency injection
 * State machine to manage fight behaviour
