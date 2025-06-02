@@ -65,6 +65,6 @@ exploration vs fight experience and establish necessary workflows like progress 
 * Map class can be extended to create other types of maps like rectangular, graph
 * Enemy class can be extended to create other types of enemies like medium, large
 * Map service follows SOLID principles to allow map generations of different types
-* Enemy service follows SOLID principles to allow map generations of different types
+* Enemy service follows SOLID principles to allow enemy generations of different types
 * RPG API follows SOLID principles to allow more features like fighting, exploration
 * Default options can be changed or more options added
