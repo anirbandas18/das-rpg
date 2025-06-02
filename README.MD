@@ -63,6 +63,8 @@ exploration vs fight experience and establish necessary workflows like progress 
 * Create new character types by adding new values in the CharacterType enum
 * Players can choose their favorite character type during character creation by using string based overloaded variant of CharacterTypeService.retrieveCharacterType(String) method
 * Map class can be extended to create other types of maps like rectangular, graph
+* Enemy class can be extended to create other types of enemies like medium, large
 * Map service follows SOLID principles to allow map generations of different types
-* RPG API follows SOLID principles to allow more features like choosing a fight
+* Enemy service follows SOLID principles to allow map generations of different types
+* RPG API follows SOLID principles to allow more features like fighting, exploration
 * Default options can be changed or more options added
