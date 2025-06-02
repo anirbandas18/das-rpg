@@ -43,18 +43,20 @@ You can find detailed instructions on how to play the game in HELP.MD
 * Player can save and resume the progress of exploration
 
 ## Trade off
-The MVP focuses on exploration as the core feature to preserve the RPG experience. 
-Save and resume functionality is included to support this. Fights for gaining experience 
-is planned for the future but excluded from the MVP to ensure a stable and non-volatile 
-exploration experience and establish necessary workflows like progress tracking, which 
-will be crucial once fights to gai experience are introduced.
+* The MVP focuses on exploration and fights as the core feature to preserve the RPG experience. 
+* Save and resume functionality is included to support this.
+* Fights on a map when exploring is planned for the future but excluded from the MVP to ensure a stable, non-volatile, disconnected 
+exploration vs fight experience and establish necessary workflows like progress tracking.
+* Explorations can be performed on the default map to avoid map management complexity.
+* Fights can fought against the default enemy to avoid enemy management complexity.
+
 
 ## Technical decision records
 * Architectural components using ddd
 * Feature workflows using mvc
 * Business logic creation using singleton
 * Component are composed with dependency injection
-* State machine to manage game and exploration behaviour
+* State machine to manage game, exploration and fight behaviour
 
 ## Extensibility of the project
 * Create new character types by adding new values in the CharacterType enum
