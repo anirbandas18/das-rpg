@@ -34,6 +34,8 @@ public class DefaultConfigurationFileManagerImpl implements FileManager<Configur
             Configuration defaultConfigurations = new Configuration.Builder()
                     .defaultMagnitudeOfGridMap(Integer.valueOf(prop.getProperty("map.grid.magnitude")))
                     .defaultNameOfGridMap(prop.getProperty("map.grid.name"))
+                    .defaultNameOfSimpleEnemy(prop.getProperty("enemy.simple.name"))
+                    .defaultStrengthOfSimpleEnemy(Integer.valueOf(prop.getProperty("enemy.simple.strength")))
                     .build();
             is.close();
             return defaultConfigurations;

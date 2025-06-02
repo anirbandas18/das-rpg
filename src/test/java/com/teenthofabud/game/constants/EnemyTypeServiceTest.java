@@ -15,7 +15,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
-public class CharacterTypeServiceTest {
+public class EnemyTypeServiceTest {
 
     private static CharacterTypeService CHARACTER_TYPE_SERVICE;
 

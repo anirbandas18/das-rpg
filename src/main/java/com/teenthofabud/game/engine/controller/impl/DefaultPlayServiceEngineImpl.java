@@ -1,36 +1,23 @@
 package com.teenthofabud.game.engine.controller.impl;
 
+import com.teenthofabud.game.engine.controller.PlayService;
 import com.teenthofabud.game.engine.renderer.RenderingException;
 import com.teenthofabud.game.engine.service.RPGAPI;
 import com.teenthofabud.game.engine.service.RPGException;
-import com.teenthofabud.game.engine.controller.MenuService;
-import com.teenthofabud.game.engine.controller.MenuException;
+import com.teenthofabud.game.engine.controller.PlayException;
 import com.teenthofabud.game.engine.renderer.RenderingService;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 
-public class DefaultMenuServiceEngineImpl implements MenuService {
-
-    private static final String PLAY_MENU = """
-            ▐▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▌
-            ▐          Play           ▌
-            ▐=========================▌
-            ▐  C - Create character   ▌
-            ▐  E - Explore            ▌
-            ▐  S - Save game          ▌
-            ▐  D - Delete game        ▌
-            ▐  R - Resume game        ▌
-            ▐  X - Exit game          ▌
-            ▐▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▌
-            """;
+public class DefaultPlayServiceEngineImpl implements PlayService {
 
     private BufferedReader stdin;
     private RenderingService renderingService;
     private RPGAPI rpgapi;
 
 
-    private DefaultMenuServiceEngineImpl(BufferedReader bufferedReader,
+    private DefaultPlayServiceEngineImpl(BufferedReader bufferedReader,
                                          RenderingService renderingService,
                                          RPGAPI rpgapi) {
         this.stdin = bufferedReader;
@@ -39,45 +26,42 @@ public class DefaultMenuServiceEngineImpl implements MenuService {
     }
 
     @Override
-    public void play() throws MenuException {
+    public void play() throws PlayException {
         try {
             rpgapi.init();
             while(true) {
-                renderingService.menu(PLAY_MENU);
+                renderingService.menu(menu());
                 String option = stdin.readLine();
                 switch (option.toUpperCase()) {
                     case "C" -> rpgapi.createCharacter();
                     case "E" -> rpgapi.explore();
+                    case "F" -> rpgapi.fight();
                     case "S" -> rpgapi.saveGame();
                     case "D" -> rpgapi.deleteGame();
-                    case "R" -> {
-                        if(rpgapi.resumeGame()) {
-                            rpgapi.explore();
-                        }
-                    }
+                    case "R" -> rpgapi.resumeGame();
                     case "X" -> rpgapi.exitGame();
                     default -> renderingService.error("Option " + option + " not supported. Try again!");
                 }
             }
         } catch (IOException e) {
-            throw new MenuException(e.getMessage());
+            throw new PlayException(e.getMessage());
         } catch (RPGException | RenderingException e) {
-            renderingService.error("RPG failure: " + e.getMessage());
+            renderingService.error("Menu failure: " + e.getMessage());
         }
     }
 
-    private static volatile MenuService INSTANCE;
+    private static volatile PlayService INSTANCE;
 
-    public static MenuService getInstance(BufferedReader bufferedReader,
+    public static PlayService getInstance(BufferedReader bufferedReader,
                                           RenderingService renderingService,
                                           RPGAPI rpgapi) {
-        MenuService result = INSTANCE;
+        PlayService result = INSTANCE;
         if (result != null) {
             return result;
         }
-        synchronized(DefaultMenuServiceEngineImpl.class) {
+        synchronized(DefaultPlayServiceEngineImpl.class) {
             if (INSTANCE == null) {
-                INSTANCE = new DefaultMenuServiceEngineImpl(bufferedReader, renderingService, rpgapi);
+                INSTANCE = new DefaultPlayServiceEngineImpl(bufferedReader, renderingService, rpgapi);
             }
             return INSTANCE;
         }

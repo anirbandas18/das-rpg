@@ -25,7 +25,7 @@ public interface TestDataSourceProvider {
     }
 
     default Checkpoint checkpoint(Character character) {
-        return new Checkpoint.Builder().character(character).x(0).y(0).build();
+        return new Checkpoint.Builder().character(character).x(0).y(0).experience(0).build();
     }
 
     default Configuration configuration() {

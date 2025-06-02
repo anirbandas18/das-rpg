@@ -1,5 +1,8 @@
 package com.teenthofabud.game.engine.renderer;
 
+import com.teenthofabud.game.resources.character.Character;
+import com.teenthofabud.game.resources.enemy.Enemy;
+
 public interface RenderingService {
 
     public void menu(String options) throws RenderingException;

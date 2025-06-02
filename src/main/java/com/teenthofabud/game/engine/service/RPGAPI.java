@@ -10,6 +10,8 @@ public interface RPGAPI {
 
     public void explore() throws RPGException;
 
+    public void fight() throws RPGException;
+
     public boolean resumeGame() throws RPGException;
 
     public void saveGame() throws RPGException;

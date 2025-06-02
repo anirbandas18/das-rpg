@@ -1,12 +1,16 @@
 package com.teenthofabud.game.engine;
 
 import com.teenthofabud.game.TestDataSourceProvider;
+import com.teenthofabud.game.constants.action.service.ActionService;
+import com.teenthofabud.game.constants.action.service.impl.DefaultActionServiceImpl;
 import com.teenthofabud.game.constants.charactertype.CharacterType;
 import com.teenthofabud.game.constants.charactertype.service.CharacterTypeService;
 import com.teenthofabud.game.constants.movement.service.MovementService;
 import com.teenthofabud.game.constants.movement.service.impl.DefaultMovementServiceImpl;
 import com.teenthofabud.game.engine.exploration.ExplorationService;
 import com.teenthofabud.game.engine.exploration.impl.DefaultExplorationServiceImpl;
+import com.teenthofabud.game.engine.fight.FightSimulation;
+import com.teenthofabud.game.engine.fight.impl.DefaultFightSimulationImpl;
 import com.teenthofabud.game.engine.renderer.RenderingService;
 import com.teenthofabud.game.engine.renderer.impl.DefaultStdoutRenderingImpl;
 import com.teenthofabud.game.engine.service.RPGAPI;
@@ -18,6 +22,9 @@ import com.teenthofabud.game.persistence.checkpoint.Checkpoint;
 import com.teenthofabud.game.persistence.configuration.Configuration;
 import com.teenthofabud.game.resources.character.Character;
 import com.teenthofabud.game.resources.character.service.CharacterService;
+import com.teenthofabud.game.resources.enemy.service.EnemyService;
+import com.teenthofabud.game.resources.experience.service.ExperienceService;
+import com.teenthofabud.game.resources.experience.service.impl.DefaultExperienceServiceImpl;
 import com.teenthofabud.game.resources.map.MapException;
 import com.teenthofabud.game.resources.map.service.MapService;
 import com.teenthofabud.game.resources.player.Player;
@@ -49,6 +56,10 @@ public class RPGServiceTest implements TestDataSourceProvider {
     private static MovementService MOVEMENT_SERVICE;
     private static ExplorationService EXPLORATION_SERVICE;
     private static MapService MAP_SERVICE;
+    private static EnemyService ENEMY_SERVICE;
+    private static FightSimulation FIGHT_SIMULATION;
+    private static ActionService ACTION_SERVICE;
+    private static ExperienceService EXPERIENCE_SERVICE;
 
     private String playerName;
     private Player player;
@@ -70,6 +81,7 @@ public class RPGServiceTest implements TestDataSourceProvider {
         reset(CHECKPOINT_FILE_MANAGER);
         reset(CONFIGURATION_FILE_MANAGER);
         reset(MAP_SERVICE);
+        reset(ENEMY_SERVICE);
     }
 
     @BeforeAll
@@ -81,10 +93,14 @@ public class RPGServiceTest implements TestDataSourceProvider {
         CHARACTER_TYPE_SERVICE = mock(CharacterTypeService.class);
         CHARACTER_SERVICE = mock(CharacterService.class);
         MAP_SERVICE = mock(MapService.class);
+        ENEMY_SERVICE = mock(EnemyService.class);
         RENDERING_SERVICE = DefaultStdoutRenderingImpl.getInstance();
         MOVEMENT_SERVICE = DefaultMovementServiceImpl.getInstance();
+        ACTION_SERVICE = DefaultActionServiceImpl.getInstance();
+        EXPERIENCE_SERVICE = DefaultExperienceServiceImpl.getInstance();
         EXPLORATION_SERVICE = DefaultExplorationServiceImpl.getInstance(RENDERING_SERVICE, MOVEMENT_SERVICE);
-        RPGAPI = DefaultRPGServiceImpl.getInstance(STDIN, PLAYER_SERVICE, CHARACTER_TYPE_SERVICE, CHARACTER_SERVICE, CHECKPOINT_FILE_MANAGER, RENDERING_SERVICE, EXPLORATION_SERVICE, MAP_SERVICE);
+        FIGHT_SIMULATION = DefaultFightSimulationImpl.getInstance(RENDERING_SERVICE, ACTION_SERVICE);
+        RPGAPI = DefaultRPGServiceImpl.getInstance(STDIN, PLAYER_SERVICE, CHARACTER_TYPE_SERVICE, CHARACTER_SERVICE, CHECKPOINT_FILE_MANAGER, RENDERING_SERVICE, EXPLORATION_SERVICE, MAP_SERVICE, ENEMY_SERVICE, FIGHT_SIMULATION, EXPERIENCE_SERVICE);
     }
 
     @Test

@@ -12,6 +12,9 @@ public class DefaultStdoutRenderingImpl implements RenderingService {
     private static final String ANSI_YELLOW = "\u001B[33m";
     private static final String ANSI_RED = "\u001B[31m";
 
+    private static final String CHARACTER = " 0 ";
+    private static final String GRID_POINT = " . ";
+
     @Override
     public void menu(String options)  throws RenderingException {
         if(options == null || options.length() == 0) {
@@ -35,9 +38,9 @@ public class DefaultStdoutRenderingImpl implements RenderingService {
             System.out.print(ANSI_WHITE + "|");
             for(int i = 0 ; i < magnitude ; i++) {
                 if(j == x && i == y) {
-                    System.out.print(" O ");
+                    System.out.print(CHARACTER);
                 } else {
-                    System.out.print(" . ");
+                    System.out.print(GRID_POINT);
                 }
             }
             System.out.print("|" + ANSI_RESET);

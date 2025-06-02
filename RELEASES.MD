@@ -35,3 +35,10 @@
 * Validate rendering of menu and map
 * Check file existence in file manager
 * Added unit tests for game engine
+
+---
+
+### v3.0
+* Fight simulation
+* Experience management
+* Default enemy

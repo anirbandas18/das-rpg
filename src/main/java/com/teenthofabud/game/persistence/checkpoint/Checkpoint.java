@@ -13,10 +13,12 @@ public class Checkpoint implements Serializable {
 
     private Character character;
     private Point coordinates;
+    private Integer experience;
 
     private Checkpoint(Builder builder) {
         this.character = builder.character;
         this.coordinates = builder.coordinates;
+        this.experience = builder.experience;
     }
 
     public Character getCharacter() {
@@ -39,17 +41,25 @@ public class Checkpoint implements Serializable {
         this.coordinates.y = y;
     }
 
+    public Integer getExperience() {
+        return experience;
+    }
+
+    public void setExperience(Integer experience) {
+        this.experience = experience;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Checkpoint that = (Checkpoint) o;
-        return Objects.equals(getCharacter(), that.getCharacter()) && Objects.equals(coordinates, that.coordinates);
+        return Objects.equals(getCharacter(), that.getCharacter()) && Objects.equals(coordinates, that.coordinates) && Objects.equals(getExperience(), that.getExperience());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getCharacter(), coordinates);
+        return Objects.hash(getCharacter(), coordinates, getExperience());
     }
 
     @Override
@@ -57,15 +67,22 @@ public class Checkpoint implements Serializable {
         return new StringJoiner(", ", Checkpoint.class.getSimpleName() + "[", "]")
                 .add("character=" + character)
                 .add("coordinates=" + coordinates)
+                .add("experience=" + experience)
                 .toString();
     }
 
     public static class Builder {
         private Character character;
         private Point coordinates;
+        private Integer experience;
 
         public Builder character(Character character) {
             this.character = character;
+            return this;
+        }
+
+        public Builder experience(Integer experience) {
+            this.experience = experience;
             return this;
         }
 
