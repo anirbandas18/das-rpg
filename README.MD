@@ -55,12 +55,12 @@ exploration vs fight experience
 
 ## Technical decision records
 * Architectural components using ddd
-* Interactive with feature workflows using mvc
+* Interaction workflows for game features using mvc
 * Business logic creation using singleton
 * Component are composed with dependency injection
 * State machine to manage fight behaviour
 * Visitor pattern allows the character to explore a map
-* Facade pattern allows the player to manage the game
+* Facade pattern allows the player to play the game
 
 ## Extensibility of the project
 * Create new character types by adding new values in the CharacterType enum
