@@ -39,8 +39,9 @@ You can find detailed instructions on how to play the game in HELP.MD
 
 ## MVP
 * Player can create a random character
-* Player can explore with the chosen character
+* Player can explore and fight with the chosen character
 * Player can save and resume the progress of exploration
+* Player can save and resume the experience from fights
 
 ## Trade off
 * The MVP focuses on exploration and fights as the core feature to preserve the RPG experience. 
